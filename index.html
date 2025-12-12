@@ -1,0 +1,416 @@
+<!-- 
+    ============================================
+    PAGE D'ACCUEIL - CINETECH
+    ============================================
+    Page principale de l'application Cinetech
+    Affiche :
+    - Section hero (bannière d'accueil)
+    - Films populaires du moment
+    - Séries populaires du moment
+    
+    Les données sont récupérées depuis l'API TMDB (The Movie Database)
+    et affichées dynamiquement via JavaScript (app.js)
+-->
+
+<!-- Déclaration du type de document HTML5 -->
+<!DOCTYPE html>
+
+<!-- 
+    Élément racine HTML avec attribut lang
+    lang="fr" = langue française
+    Important pour :
+    - L'accessibilité (lecteurs d'écran)
+    - Le SEO (référencement)
+    - Les navigateurs (correcteur orthographique, traduction)
+-->
+<html lang="fr">
+
+<head>
+    <!-- 
+        ============================================
+        EN-TÊTE DU DOCUMENT (métadonnées)
+        ============================================
+        Contient les informations non visibles mais essentielles
+        pour le navigateur, le SEO, et le bon affichage
+    -->
+    
+    <!-- 
+        Encodage des caractères en UTF-8
+        UTF-8 = encodage universel qui supporte :
+        - Les caractères accentués (é, è, à, ç, etc.)
+        - Les emojis (🎬, ⭐, ❤️, etc.)
+        - Tous les alphabets (latin, cyrillique, arabe, chinois, etc.)
+        Obligatoire pour un affichage correct
+    -->
+    <meta charset="UTF-8">
+    
+    <!-- 
+        Configuration du viewport pour le responsive design
+        viewport = zone visible du navigateur
+        
+        width=device-width :
+        - La largeur de la page = largeur de l'écran de l'appareil
+        - S'adapte automatiquement (mobile, tablette, desktop)
+        
+        initial-scale=1.0 :
+        - Zoom initial à 100% (pas de zoom par défaut)
+        - L'utilisateur peut zoomer mais la page démarre à taille normale
+        
+        Cette balise est ESSENTIELLE pour le responsive design
+        Sans elle, les mobiles afficheraient la version desktop réduite
+    -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- 
+        Titre de la page affiché dans :
+        - L'onglet du navigateur
+        - Les favoris/signets
+        - Les résultats de recherche Google
+        - L'historique du navigateur
+        
+        Important pour le SEO (référencement)
+        Doit être descriptif et contenir des mots-clés pertinents
+    -->
+    <title>Cinetech - Votre bibliothèque de films et séries</title>
+    
+    <!-- 
+        Lien vers la feuille de style CSS externe
+        rel="stylesheet" = relation de type feuille de style
+        href="css/style.css" = chemin relatif vers le fichier CSS
+        
+        Le CSS contient TOUS les styles visuels :
+        - Couleurs, polices, espacements
+        - Layouts (Grid, Flexbox)
+        - Responsive design (media queries)
+        - Animations et transitions
+    -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<!-- 
+    Corps du document HTML
+    Contient TOUT le contenu visible de la page
+    Structure : header > main > footer
+-->
+<body>
+    <!-- 
+        ============================================
+        HEADER (EN-TÊTE) - Navigation principale
+        ============================================
+        Header sticky (reste visible en haut lors du scroll)
+        Identique sur toutes les pages pour la cohérence UX
+        
+        Structure :
+        - Logo Cinetech (gauche)
+        - Menu de navigation (centre)
+        - Barre de recherche (droite)
+    -->
+    <header>
+        <!-- 
+            Container = conteneur centralisé
+            Classe CSS réutilisable qui :
+            - Centre le contenu horizontalement
+            - Limite la largeur maximale (ex: 1200px)
+            - Ajoute du padding sur les côtés pour mobile
+            
+            Utilisé sur TOUTES les sections pour cohérence
+        -->
+        <div class="container">
+            <!-- 
+                Conteneur flexbox pour disposition horizontale
+                CSS : display: flex + justify-content: space-between
+                Répartit : logo | navigation | recherche
+            -->
+            <div class="header-content">
+                <!-- 
+                    Logo Cinetech
+                    h1 = heading 1 (titre principal)
+                    Important pour le SEO : le h1 doit contenir le nom du site
+                    
+                    🎬 = emoji cinéma pour identité visuelle
+                    <a> = lien vers page d'accueil (standard UX)
+                -->
+                <h1 class="logo"><a href="index.html">🎬 Cinetech</a></h1>
+                
+                <!-- 
+                    Navigation principale du site
+                    <nav> = balise sémantique HTML5 pour la navigation
+                    Important pour :
+                    - L'accessibilité (lecteurs d'écran)
+                    - Le SEO (structure de site)
+                -->
+                <nav>
+                    <!-- 
+                        Liste non ordonnée (ul = unordered list)
+                        Sémantiquement correct pour un menu
+                        CSS transforme en disposition horizontale
+                    -->
+                    <ul>
+                        <!-- 
+                            Lien Accueil avec classe "active"
+                            .active = style CSS différent (souligné/rouge)
+                            Indique à l'utilisateur sur quelle page il est
+                        -->
+                        <li><a href="index.html" class="active">Accueil</a></li>
+                        
+                        <!-- Lien vers page des films -->
+                        <li><a href="movies.html">Films</a></li>
+                        
+                        <!-- Lien vers page des séries -->
+                        <li><a href="series.html">Séries</a></li>
+                        
+                        <!-- Lien vers page des favoris -->
+                        <li><a href="favorites.html">Favoris</a></li>
+                    </ul>
+                </nav>
+                
+                <!-- 
+                    Conteneur de la barre de recherche
+                    position: relative en CSS pour que les résultats
+                    puissent être positionnés en absolute (dropdown)
+                -->
+                <div class="search-container">
+                    <!-- 
+                        Input de recherche
+                        
+                        Attributs :
+                        - type="text" = champ texte standard
+                        - id="searchInput" = identifiant unique pour JavaScript
+                          JavaScript écoute les saisies (keyup) pour recherche instantanée
+                        - placeholder = texte gris indicatif quand le champ est vide
+                          Disparaît dès que l'utilisateur tape
+                    -->
+                    <input type="text" id="searchInput" placeholder="Rechercher un film ou une série...">
+                    
+                    <!-- 
+                        Conteneur des résultats de recherche
+                        
+                        Vide par défaut dans le HTML
+                        Rempli DYNAMIQUEMENT par JavaScript (search.js)
+                        
+                        Affichage :
+                        - Caché par défaut (display: none)
+                        - Visible quand il y a des résultats (JavaScript ajoute du contenu)
+                        - Position absolute pour apparaître sous l'input (effet dropdown)
+                        - Liste de cartes cliquables avec poster + titre
+                    -->
+                    <div id="searchResults" class="search-results"></div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 
+        ============================================
+        MAIN (CONTENU PRINCIPAL)
+        ============================================
+        Balise sémantique <main> pour le contenu principal de la page
+        Important pour :
+        - L'accessibilité (lecteurs d'écran passent directement au main)
+        - Le SEO (Google identifie le contenu principal)
+        
+        Une seule balise <main> par page (contrairement à <section>)
+    -->
+    <main>
+        <!-- 
+            ============================================
+            SECTION HERO (Bannière d'accueil)
+            ============================================
+            Première section visible = section hero
+            But : accueillir l'utilisateur et présenter le site
+            
+            Style CSS :
+            - Background avec dégradé de couleurs
+            - Texte centré et de grande taille
+            - Padding vertical généreux
+        -->
+        <section class="hero">
+            <!-- Vidéo en arrière-plan en autoplay et loop -->
+            <video class="hero-video" autoplay muted loop playsinline>
+                <source src="images/hero-video.mp4" type="video/mp4">
+                Votre navigateur ne supporte pas la vidéo HTML5.
+            </video>
+            
+            <!-- Container pour centrer le contenu -->
+            <div class="container">
+                <!-- 
+                    Titre principal de la section hero
+                    h2 = heading 2 (sous-titre après le h1 du logo)
+                    Message d'accueil chaleureux
+                -->
+                <h2>Bienvenue sur Cinetech</h2>
+                
+                <!-- 
+                    Paragraphe de description
+                    Slogan court expliquant la proposition de valeur
+                -->
+                <p>Découvrez les meilleurs films et séries du moment</p>
+            </div>
+        </section>
+
+        <!-- 
+            ============================================
+            SECTION : FILMS POPULAIRES
+            ============================================
+            Première section de contenu dynamique
+            Affiche les films les plus populaires du moment selon TMDB
+            
+            Données récupérées par :
+            1. app.js appelle l'API TMDB (endpoint /movie/popular)
+            2. Reçoit un tableau de 20 films
+            3. Crée des cartes HTML pour chaque film
+            4. Injecte les cartes dans #popularMovies
+        -->
+        <section class="section">
+            <!-- Container pour centrer le contenu -->
+            <div class="container">
+                <!-- 
+                    Titre de la section
+                    Classe .section-title = style cohérent pour tous les titres
+                -->
+                <h2 class="section-title">Films Populaires</h2>
+                
+                <!-- 
+                    Grille de cartes de films
+                    
+                    Attributs :
+                    - id="popularMovies" = ciblé par JavaScript pour injection
+                    - class="media-grid" = grille CSS responsive
+                      CSS : display: grid
+                      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr))
+                      Résultat : s'adapte automatiquement à la largeur d'écran
+                      Desktop : 5-6 cartes par ligne
+                      Tablette : 3-4 cartes par ligne
+                      Mobile : 2 cartes par ligne
+                    
+                    Contenu par défaut :
+                    - Message "Chargement..." affiché pendant l'appel API
+                    - Remplacé par les vraies cartes une fois les données reçues
+                -->
+                <div id="popularMovies" class="media-grid">
+                    <!-- 
+                        Message de chargement temporaire
+                        Classe .loading = style CSS (centré, gris, padding)
+                        Supprimé par JavaScript quand les données arrivent
+                    -->
+                    <div class="loading">Chargement...</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 
+            ============================================
+            SECTION : SÉRIES POPULAIRES
+            ============================================
+            Deuxième section de contenu dynamique
+            Affiche les séries TV les plus populaires du moment selon TMDB
+            
+            Fonctionnement identique à la section Films Populaires :
+            1. Appel API TMDB (endpoint /tv/popular)
+            2. Réception de 20 séries
+            3. Création de cartes HTML
+            4. Injection dans #popularSeries
+            
+            Structure de carte identique (réutilisation CSS) :
+            - Poster de la série
+            - Titre
+            - Note (⭐)
+            - Bouton favori (❤️)
+            - Lien vers page de détails
+        -->
+        <section class="section">
+            <!-- Container pour centrer le contenu -->
+            <div class="container">
+                <!-- Titre de la section -->
+                <h2 class="section-title">Séries Populaires</h2>
+                
+                <!-- 
+                    Grille de cartes de séries
+                    
+                    id="popularSeries" = ciblé par JavaScript (app.js)
+                    Grille CSS responsive identique aux films
+                    S'adapte automatiquement à tous les écrans
+                -->
+                <div id="popularSeries" class="media-grid">
+                    <!-- 
+                        Message de chargement
+                        Affiché pendant la récupération des données API
+                    -->
+                    <div class="loading">Chargement...</div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 
+        ============================================
+        FOOTER (PIED DE PAGE)
+        ============================================
+        Présent sur toutes les pages pour cohérence
+        Contient les informations légales et crédits
+    -->
+    <footer>
+        <!-- Container pour centrer le contenu -->
+        <div class="container">
+            <!-- 
+                Texte de copyright et attribution
+                
+                &copy; = entité HTML pour le symbole © (copyright)
+                Alternative : utiliser directement © si UTF-8 est bien configuré
+                
+                Mention TMDB OBLIGATOIRE selon les conditions d'utilisation de l'API
+                TMDB impose d'indiquer la source des données
+                Conditions : https://www.themoviedb.org/documentation/api/terms-of-use
+            -->
+            <p>&copy; 2025 Cinetech. Données fournies par TMDB.</p>
+        </div>
+    </footer>
+
+    <!-- 
+        ============================================
+        SCRIPT JAVASCRIPT - MODULE ES6
+        ============================================
+        Chargement du fichier JavaScript principal de la page d'accueil
+        
+        Attribut type="module" = CRUCIAL
+        Active le mode module ES6 qui permet :
+        
+        1. Import/Export de modules :
+           import { config } from './config.js'
+           import { API } from './api.js'
+           Permet de diviser le code en fichiers organisés
+        
+        2. Mode strict automatique :
+           "use strict" activé par défaut
+           Évite les erreurs courantes JavaScript
+        
+        3. Portée des variables :
+           Variables déclarées ne polluent pas le scope global
+           Évite les conflits entre scripts
+        
+        4. Chargement différé (defer) automatique :
+           Script chargé en parallèle du HTML
+           Exécuté APRÈS le parsing complet du DOM
+           Pas besoin de DOMContentLoaded
+           N'bloque pas l'affichage de la page
+        
+        5. Support des fonctionnalités modernes :
+           async/await, classes, arrow functions, etc.
+        
+        Fichier app.js contient :
+        - Initialisation de l'application
+        - Récupération des films populaires (API TMDB)
+        - Récupération des séries populaires (API TMDB)
+        - Affichage dynamique des cartes
+        - Import et initialisation de la recherche (search.js)
+        - Gestion des favoris
+        
+        Ordre d'exécution :
+        1. HTML parsé et affiché (structure visible immédiatement)
+        2. CSS appliqué (styles visuels)
+        3. JavaScript chargé et exécuté (données dynamiques)
+        4. Messages "Chargement..." remplacés par vraies données
+    -->
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>

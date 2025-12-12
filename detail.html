@@ -1,0 +1,285 @@
+<!-- 
+    ============================================
+    PAGE DE DÉTAILS - CINETECH
+    ============================================
+    Cette page affiche les informations détaillées d'un film ou d'une série :
+    - Image backdrop en hero
+    - Poster, titre, note, date de sortie, synopsis
+    - Casting et équipe technique
+    - Suggestions similaires
+    - Section commentaires (ajout, affichage, réponses)
+    
+    L'ID du média est récupéré depuis l'URL (?id=123&type=movie)
+-->
+
+<!-- Déclaration du type de document HTML5 -->
+<!DOCTYPE html>
+
+<!-- 
+    Élément racine HTML avec attribut lang
+    lang="fr" = langue française pour l'accessibilité et le SEO
+-->
+<html lang="fr">
+
+<head>
+    <!-- 
+        ============================================
+        EN-TÊTE DU DOCUMENT (métadonnées)
+        Informations non visibles mais essentielles
+        ============================================
+    -->
+    
+    <!-- 
+        Encodage des caractères en UTF-8
+        Permet l'affichage des caractères spéciaux (accents, emojis, etc.)
+    -->
+    <meta charset="UTF-8">
+    
+    <!-- 
+        Configuration du viewport pour le responsive design
+        width=device-width = largeur = largeur de l'écran de l'appareil
+        initial-scale=1.0 = zoom initial à 100%
+        Essentiel pour l'affichage mobile
+    -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- 
+        Titre de la page affiché dans l'onglet du navigateur
+        Changera dynamiquement via JavaScript avec le nom du film/série
+    -->
+    <title>Détail - Cinetech</title>
+    
+    <!-- 
+        Lien vers la feuille de style CSS
+        Contient tous les styles visuels de l'application
+        href="css/style.css" = chemin relatif vers le fichier
+    -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<!-- 
+    Corps du document
+    Contient tout le contenu visible de la page
+-->
+<body>
+    <!-- 
+        ============================================
+        HEADER (EN-TÊTE) - Navigation principale
+        ============================================
+        Header sticky présent sur toutes les pages
+        Contient: logo, navigation, barre de recherche
+    -->
+    <header>
+        <!-- 
+            Container pour centrer et limiter la largeur du contenu
+            Classe CSS réutilisable sur toute l'application
+        -->
+        <div class="container">
+            <!-- 
+                Conteneur flexbox pour disposition horizontale
+                Logo à gauche, navigation au centre, recherche à droite
+            -->
+            <div class="header-content">
+                <!-- 
+                    Logo Cinetech (h1 pour SEO)
+                    🎬 = emoji pour représenter le cinéma
+                    Lien vers la page d'accueil
+                -->
+                <h1 class="logo"><a href="index.html">🎬 Cinetech</a></h1>
+                
+                <!-- 
+                    Navigation principale du site
+                    Élément <nav> sémantique pour l'accessibilité
+                -->
+                <nav>
+                    <!-- 
+                        Liste non ordonnée des liens de navigation
+                        Affichée horizontalement via CSS (flexbox)
+                    -->
+                    <ul>
+                        <!-- Lien vers la page d'accueil -->
+                        <li><a href="index.html">Accueil</a></li>
+                        
+                        <!-- Lien vers la page des films -->
+                        <li><a href="movies.html">Films</a></li>
+                        
+                        <!-- Lien vers la page des séries -->
+                        <li><a href="series.html">Séries</a></li>
+                        
+                        <!-- Lien vers la page des favoris -->
+                        <li><a href="favorites.html">Favoris</a></li>
+                    </ul>
+                </nav>
+                
+                <!-- 
+                    Conteneur de la barre de recherche
+                    Position relative pour le dropdown de résultats en absolute
+                -->
+                <div class="search-container">
+                    <!-- 
+                        Input de recherche
+                        id="searchInput" = ciblé par JavaScript pour écouter les saisies
+                        type="text" = champ texte standard
+                        placeholder = texte indicatif gris quand le champ est vide
+                    -->
+                    <input type="text" id="searchInput" placeholder="Rechercher un film ou une série...">
+                    
+                    <!-- 
+                        Conteneur des résultats de recherche
+                        Vide par défaut, rempli dynamiquement par JavaScript
+                        Affiché en position absolute sous l'input (dropdown)
+                    -->
+                    <div id="searchResults" class="search-results"></div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 
+        ============================================
+        MAIN (CONTENU PRINCIPAL)
+        ============================================
+        Contient tout le contenu de la page de détails
+    -->
+    <main>
+        <!-- 
+            ============================================
+            SECTION 1 : DÉTAILS DU FILM/SÉRIE
+            ============================================
+            Conteneur pour les informations détaillées
+            Sera rempli dynamiquement par JavaScript (detail.js)
+            Structure créée : hero (backdrop) + poster + infos + casting
+        -->
+        <div id="detailContent">
+            <!-- 
+                Message de chargement affiché par défaut
+                Remplacé par le contenu une fois les données API chargées
+                Centré avec padding via classe CSS .loading
+            -->
+            <div class="loading">Chargement...</div>
+        </div>
+
+        <!-- 
+            ============================================
+            SECTION 2 : SUGGESTIONS SIMILAIRES
+            ============================================
+            Affiche des films/séries similaires recommandés par TMDB
+            Algorithme de recommandation basé sur genre, mots-clés, etc.
+        -->
+        <section class="section">
+            <!-- Container pour centrer le contenu -->
+            <div class="container">
+                <!-- Titre de la section -->
+                <h2 class="section-title">Suggestions similaires</h2>
+                
+                <!-- 
+                    Grille de médias similaires
+                    id="similarMedia" = ciblé par JavaScript pour injecter les cartes
+                    Classe .media-grid = grille CSS responsive (auto-fill)
+                -->
+                <div id="similarMedia" class="media-grid">
+                    <!-- Message de chargement temporaire -->
+                    <div class="loading">Chargement...</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 
+            ============================================
+            SECTION 3 : COMMENTAIRES
+            ============================================
+            Système de commentaires complet :
+            - Formulaire d'ajout de commentaire
+            - Liste des commentaires existants
+            - Possibilité de répondre aux commentaires (thread)
+            Données stockées dans localStorage (pas de backend)
+        -->
+        <section class="section comments-section">
+            <!-- Container pour centrer le contenu -->
+            <div class="container">
+                <!-- Titre de la section -->
+                <h2 class="section-title">Commentaires</h2>
+                
+                <!-- 
+                    ========================================
+                    FORMULAIRE D'AJOUT DE COMMENTAIRE
+                    ========================================
+                    Permet à l'utilisateur d'écrire un nouveau commentaire
+                -->
+                <div class="add-comment">
+                    <!-- Titre du formulaire -->
+                    <h3>Ajouter un commentaire</h3>
+                    
+                    <!-- 
+                        Zone de texte (textarea) pour écrire le commentaire
+                        id="commentText" = ciblé par JavaScript pour récupérer la valeur
+                        Hauteur minimum 100px, redimensionnable verticalement
+                    -->
+                    <textarea id="commentText" placeholder="Votre commentaire..."></textarea>
+                    
+                    <!-- 
+                        Bouton de soumission du commentaire
+                        id="submitComment" = écouteur d'événement en JavaScript
+                        Classe .btn = style de bouton principal (rouge)
+                    -->
+                    <button id="submitComment" class="btn">Publier</button>
+                </div>
+
+                <!-- 
+                    ========================================
+                    LISTE DES COMMENTAIRES
+                    ========================================
+                    Conteneur pour afficher tous les commentaires
+                    Rempli dynamiquement par JavaScript depuis localStorage
+                -->
+                <div id="commentsList" class="comments-list">
+                    <!-- Message de chargement temporaire -->
+                    <div class="loading">Chargement des commentaires...</div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 
+        ============================================
+        FOOTER (PIED DE PAGE)
+        ============================================
+        Informations de copyright et crédits
+        Présent sur toutes les pages de l'application
+    -->
+    <footer>
+        <!-- Container pour centrer le contenu -->
+        <div class="container">
+            <!-- 
+                Texte de copyright et attribution
+                &copy; = entité HTML pour le symbole ©
+                Mention TMDB obligatoire selon les conditions d'utilisation de l'API
+            -->
+            <p>&copy; 2025 Cinetech. Données fournies par TMDB.</p>
+        </div>
+    </footer>
+
+    <!-- 
+        ============================================
+        SCRIPT JAVASCRIPT - MODULE ES6
+        ============================================
+        Chargement du fichier JavaScript de la page de détails
+        
+        type="module" = active le mode module ES6
+        Permet d'utiliser import/export
+        Scripts modules sont automatiquement en mode strict
+        Scripts modules sont chargés en defer (non bloquants)
+        
+        src="js/detail.js" = fichier JavaScript spécifique à cette page
+        Gère :
+        - Récupération de l'ID depuis l'URL (?id=123&type=movie)
+        - Appel API pour les détails du média
+        - Affichage dynamique (hero, poster, infos, casting)
+        - Suggestions similaires
+        - Système de commentaires (ajout, affichage, réponses)
+        - Bouton favori
+        - Recherche (via module search.js importé)
+    -->
+    <script type="module" src="js/detail.js"></script>
+</body>
+</html>

@@ -1,0 +1,353 @@
+<!-- 
+    ============================================
+    PAGE FAVORIS - CINETECH
+    ============================================
+    Page dédiée à l'affichage des films et séries favoris de l'utilisateur
+    
+    Fonctionnement :
+    - Stockage local (localStorage) dans le navigateur
+    - Aucun compte utilisateur / aucun serveur requis
+    - Données persistantes (restent après fermeture du navigateur)
+    - Clé localStorage : "cinetech_favorites"
+    - Format : tableau JSON d'objets média avec leurs infos
+    
+    Fonctionnalités :
+    - Affichage de tous les favoris (films + séries mélangés)
+    - Cartes cliquables vers page de détails
+    - Bouton de retrait des favoris (coeur rouge → coeur vide)
+    - Message si aucun favori
+    - Mise à jour temps réel
+    
+    Limitation :
+    - Favoris stockés par navigateur (pas synchronisés entre appareils)
+    - Supprimés si l'utilisateur vide le cache navigateur
+    - Limité à ~5-10 MB par domaine (suffisant pour des centaines de films)
+-->
+
+<!-- Déclaration du type de document HTML5 -->
+<!DOCTYPE html>
+
+<!-- 
+    Élément racine HTML avec langue française
+    lang="fr" = important pour accessibilité et SEO
+-->
+<html lang="fr">
+
+<head>
+    <!-- 
+        ============================================
+        EN-TÊTE DU DOCUMENT (métadonnées)
+        ============================================
+    -->
+    
+    <!-- 
+        Encodage UTF-8 pour caractères spéciaux
+        Permet affichage correct des accents et emojis
+    -->
+    <meta charset="UTF-8">
+    
+    <!-- 
+        Configuration responsive
+        width=device-width = largeur adaptative
+        initial-scale=1.0 = zoom par défaut à 100%
+        Essentiel pour affichage mobile correct
+    -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- 
+        Titre de la page
+        Affiché dans l'onglet du navigateur
+        Format : [Page] - [Nom du site]
+    -->
+    <title>Favoris - Cinetech</title>
+    
+    <!-- 
+        Lien vers feuille de style CSS partagée
+        Tous les styles visuels de l'application
+    -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<!-- 
+    Corps du document
+    Contient tout le contenu visible
+-->
+<body>
+    <!-- 
+        ============================================
+        HEADER (EN-TÊTE) - Navigation principale
+        ============================================
+        Header identique sur toutes les pages
+        Sticky (reste visible lors du scroll)
+    -->
+    <header>
+        <!-- 
+            Container centralisé
+            Limite la largeur et centre le contenu
+        -->
+        <div class="container">
+            <!-- 
+                Conteneur flexbox pour disposition horizontale
+                Logo | Navigation | Recherche
+            -->
+            <div class="header-content">
+                <!-- 
+                    Logo Cinetech avec lien vers accueil
+                    H1 pour importance SEO
+                    🎬 = emoji cinéma pour identité visuelle
+                -->
+                <h1 class="logo"><a href="index.html">🎬 Cinetech</a></h1>
+                
+                <!-- 
+                    Navigation principale
+                    Balise sémantique <nav> pour accessibilité
+                -->
+                <nav>
+                    <!-- 
+                        Liste de liens
+                        Affichée horizontalement via CSS
+                    -->
+                    <ul>
+                        <!-- Lien vers page d'accueil -->
+                        <li><a href="index.html">Accueil</a></li>
+                        
+                        <!-- Lien vers page des films -->
+                        <li><a href="movies.html">Films</a></li>
+                        
+                        <!-- Lien vers page des séries -->
+                        <li><a href="series.html">Séries</a></li>
+                        
+                        <!-- 
+                            Lien vers page des favoris (page actuelle)
+                            class="active" = style CSS différent
+                            Indique visuellement à l'utilisateur où il se trouve
+                            CSS : couleur rouge + soulignement
+                        -->
+                        <li><a href="favorites.html" class="active">Favoris</a></li>
+                    </ul>
+                </nav>
+                
+                <!-- 
+                    Conteneur de recherche
+                    Position relative pour dropdown en absolute
+                -->
+                <div class="search-container">
+                    <!-- 
+                        Input de recherche
+                        id="searchInput" = ciblé par JavaScript (search.js)
+                        Écoute les saisies (keyup event) pour recherche instantanée
+                    -->
+                    <input type="text" id="searchInput" placeholder="Rechercher un film ou une série...">
+                    
+                    <!-- 
+                        Conteneur des résultats de recherche
+                        Rempli dynamiquement par JavaScript
+                        Affiché en dropdown sous l'input
+                    -->
+                    <div id="searchResults" class="search-results"></div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 
+        ============================================
+        MAIN (CONTENU PRINCIPAL)
+        ============================================
+        Balise sémantique pour le contenu principal
+        Une seule balise <main> par page
+    -->
+    <main>
+        <!-- 
+            ============================================
+            SECTION : GRILLE DES FAVORIS
+            ============================================
+            Section unique de cette page
+            Affiche tous les films et séries mis en favoris
+            
+            Source des données :
+            - localStorage du navigateur
+            - Clé : "cinetech_favorites"
+            - Format : JSON array d'objets
+            
+            Exemple de structure localStorage :
+            [
+              {
+                "id": 550,
+                "type": "movie",
+                "title": "Fight Club",
+                "poster_path": "/pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg",
+                "vote_average": 8.4
+              },
+              {
+                "id": 1399,
+                "type": "tv",
+                "name": "Game of Thrones",
+                "poster_path": "/u3bZgnGQ9T01sWNhyveQz0wH0Hl.jpg",
+                "vote_average": 8.3
+              }
+            ]
+            
+            Traitement JavaScript (favorites.js) :
+            1. Lecture du localStorage
+            2. Parsing du JSON
+            3. Création de cartes HTML pour chaque favori
+            4. Injection dans #favoritesGrid
+            5. Si tableau vide : message "Aucun favori"
+            
+            Interactions utilisateur :
+            - Clic sur carte → page de détails
+            - Clic sur bouton ❤️ → retrait des favoris
+            - Retrait met à jour localStorage + supprime la carte de l'affichage
+        -->
+        <section class="section">
+            <!-- Container pour centrer le contenu -->
+            <div class="container">
+                <!-- 
+                    Titre de la page
+                    Classe .page-title = style pour titres de pages
+                    Différent de .section-title (sections multiples)
+                -->
+                <h2 class="page-title">Mes Favoris</h2>
+                
+                <!-- 
+                    Grille des favoris
+                    
+                    Attributs :
+                    - id="favoritesGrid" = ciblé par JavaScript pour injection
+                    - class="media-grid" = grille CSS responsive
+                      Même grille que sur les autres pages pour cohérence
+                    
+                    CSS Grid responsive :
+                    - display: grid
+                    - grid-template-columns: repeat(auto-fill, minmax(200px, 1fr))
+                    - S'adapte automatiquement à la largeur d'écran
+                    - Desktop : 5-6 cartes par ligne
+                    - Tablette : 3-4 cartes par ligne
+                    - Mobile : 2 cartes par ligne
+                    
+                    États possibles :
+                    1. Chargement : message "Chargement..." (par défaut)
+                    2. Favoris présents : cartes de médias affichées
+                    3. Aucun favori : message personnalisé JavaScript
+                       "Vous n'avez pas encore de favoris. Parcourez les films et séries..."
+                -->
+                <div id="favoritesGrid" class="media-grid">
+                    <!-- 
+                        Message de chargement par défaut
+                        Affiché pendant que JavaScript lit le localStorage
+                        Supprimé immédiatement (localStorage est instantané)
+                        Remplacé par les cartes ou le message "aucun favori"
+                    -->
+                    <div class="loading">Chargement...</div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 
+        ============================================
+        FOOTER (PIED DE PAGE)
+        ============================================
+        Footer identique sur toutes les pages
+    -->
+    <footer>
+        <!-- Container pour centrer le contenu -->
+        <div class="container">
+            <!-- 
+                Copyright et attribution TMDB
+                &copy; = entité HTML pour symbole ©
+                Attribution TMDB obligatoire selon conditions API
+            -->
+            <p>&copy; 2025 Cinetech. Données fournies par TMDB.</p>
+        </div>
+    </footer>
+
+    <!-- 
+        ============================================
+        SCRIPT JAVASCRIPT - MODULE ES6
+        ============================================
+        Chargement du fichier JavaScript spécifique aux favoris
+        
+        type="module" = Active le mode module ES6
+        Permet :
+        - Import/export de modules
+        - Mode strict automatique
+        - Chargement différé (defer)
+        - Portée isolée des variables
+        
+        Fichier favorites.js contient :
+        
+        1. LECTURE DES FAVORIS DEPUIS LOCALSTORAGE
+           - Accès à localStorage.getItem('cinetech_favorites')
+           - Parse du JSON en tableau JavaScript
+           - Gestion des erreurs (JSON invalide)
+        
+        2. AFFICHAGE DES CARTES
+           - Création de cartes HTML pour chaque favori
+           - Utilisation de la classe UIManager (ui.js)
+           - Fonction createMediaCard() réutilisée
+           - Injection dans #favoritesGrid
+        
+        3. GESTION DU BOUTON FAVORI
+           - Bouton cœur rouge (actif) sur chaque carte
+           - Clic sur bouton → retrait du favori
+           - Mise à jour du localStorage
+           - Suppression de la carte de l'affichage (animation)
+           - Si dernier favori retiré → affiche message "Aucun favori"
+        
+        4. MESSAGE SI AUCUN FAVORI
+           - Détection tableau vide ou localStorage absent
+           - Affichage message personnalisé avec liens
+           - Encourage l'utilisateur à explorer le catalogue
+        
+        5. SYNCHRONISATION
+           - Écoute des événements de favoris (custom events)
+           - Si favori ajouté depuis autre page → apparaît ici
+           - Temps réel sans rechargement de page
+        
+        6. RECHERCHE
+           - Import et initialisation du module search.js
+           - Barre de recherche fonctionnelle sur cette page aussi
+        
+        LocalStorage API :
+        - Web API native du navigateur
+        - Stockage clé-valeur (strings uniquement)
+        - Synchrone (instantané)
+        - Persistant (survit à la fermeture du navigateur)
+        - Limité à ~5-10 MB par domaine
+        - Accessible uniquement sur même domaine (sécurité)
+        
+        Structure des données favorites :
+        - Tableau d'objets média
+        - Chaque objet contient : id, type, title/name, poster_path, vote_average
+        - Format JSON stringifié pour stockage
+        - Parse requis pour lecture
+        
+        Méthodes utilisées :
+        - localStorage.getItem('cinetech_favorites') → lecture
+        - localStorage.setItem('cinetech_favorites', JSON.stringify(array)) → écriture
+        - JSON.parse(string) → conversion string → objet
+        - JSON.stringify(object) → conversion objet → string
+        
+        Avantages localStorage :
+        ✅ Aucun serveur requis (économie)
+        ✅ Instantané (pas de latence réseau)
+        ✅ Fonctionne hors ligne
+        ✅ Simple à implémenter
+        
+        Inconvénients localStorage :
+        ❌ Non synchronisé entre appareils
+        ❌ Perdu si cache vidé
+        ❌ Non sécurisé (visible en dev tools)
+        ❌ Limité en taille
+        
+        Pour une application production réelle :
+        - Utiliser un backend (Node.js, PHP, etc.)
+        - Base de données (MongoDB, MySQL, etc.)
+        - Authentification utilisateur
+        - Synchronisation cloud
+    -->
+    <script type="module" src="js/favorites.js"></script>
+</body>
+</html>

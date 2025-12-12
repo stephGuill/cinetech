@@ -1,0 +1,736 @@
+<!-- 
+    ============================================
+    PAGE SÉRIES - CINETECH
+    ============================================
+    Page dédiée à l'affichage de toutes les séries TV disponibles
+    
+    Caractéristiques :
+    - Affichage des séries populaires par pages (20 séries par page)
+    - Système de pagination complet (Précédent / Suivant)
+    - Numérotation des pages (Page 1, Page 2, etc.)
+    - Navigation à travers des milliers de séries TMDB
+    - Boutons désactivés selon contexte :
+      * "Précédent" désactivé sur page 1
+      * "Suivant" désactivé sur dernière page disponible
+    
+    Différences avec films :
+    - Endpoint API différent : /discover/tv vs /discover/movie
+    - Champ "name" au lieu de "title" dans les données
+    - Champ "first_air_date" au lieu de "release_date"
+    - Type de média : "tv" au lieu de "movie"
+    - URL de détails : detail.html?id=X&type=tv
+    
+    Source des données :
+    - API TMDB (The Movie Database)
+    - Endpoint : /discover/tv?page=X
+    - Paramètres :
+      * language=fr-FR (contenu en français)
+      * sort_by=popularity.desc (tri par popularité)
+      * page=X (numéro de page)
+    
+    Fonctionnalités :
+    - Cartes de séries cliquables vers page de détails
+    - Bouton favori sur chaque carte (❤️)
+    - Note affichée avec étoile (⭐)
+    - Images poster en haute qualité
+    - Recherche disponible via header
+    - Responsive (s'adapte à tous les écrans)
+    
+    Gestion de l'état :
+    - Variable currentPage stockée en JavaScript (series.js)
+    - URL ne change pas (pas de query string)
+    - Pas de sauvegarde de la page en localStorage
+    - Retour à la page 1 à chaque rechargement de la page
+    
+    Types de séries affichées :
+    - Séries TV populaires du monde entier
+    - Séries en cours de diffusion
+    - Séries terminées mais populaires
+    - Tous genres : drame, comédie, action, sci-fi, etc.
+-->
+
+<!-- Déclaration du type de document HTML5 -->
+<!DOCTYPE html>
+
+<!-- 
+    Élément racine HTML
+    lang="fr" = langue française
+    Important pour accessibilité et SEO
+-->
+<html lang="fr">
+
+<head>
+    <!-- 
+        ============================================
+        EN-TÊTE DU DOCUMENT (métadonnées)
+        ============================================
+    -->
+    
+    <!-- 
+        Encodage UTF-8
+        Permet affichage correct des caractères accentués et emojis
+    -->
+    <meta charset="UTF-8">
+    
+    <!-- 
+        Configuration responsive
+        width=device-width = largeur adaptative à l'appareil
+        initial-scale=1.0 = zoom par défaut à 100%
+        Essentiel pour affichage mobile correct
+    -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- 
+        Titre de la page
+        Affiché dans l'onglet du navigateur
+        Important pour SEO et UX
+    -->
+    <title>Séries - Cinetech</title>
+    
+    <!-- 
+        Lien vers feuille de style CSS
+        Contient tous les styles visuels (partagée avec toutes les pages)
+    -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<!-- 
+    Corps du document
+    Contient tout le contenu visible de la page
+-->
+<body>
+    <!-- 
+        ============================================
+        HEADER (EN-TÊTE) - Navigation principale
+        ============================================
+        Header sticky identique sur toutes les pages
+        Reste visible en haut lors du scroll (position: sticky en CSS)
+    -->
+    <header>
+        <!-- 
+            Container centralisé
+            Classe CSS réutilisable qui :
+            - Centre le contenu horizontalement
+            - Limite la largeur maximale
+            - Ajoute du padding latéral pour mobile
+        -->
+        <div class="container">
+            <!-- 
+                Conteneur flexbox pour disposition horizontale
+                CSS : display: flex + justify-content: space-between
+                Organisation : Logo | Navigation | Recherche
+            -->
+            <div class="header-content">
+                <!-- 
+                    Logo Cinetech
+                    H1 = titre principal pour SEO
+                    🎬 = emoji cinéma pour identité visuelle
+                    Lien vers page d'accueil (convention UX)
+                -->
+                <h1 class="logo"><a href="index.html">🎬 Cinetech</a></h1>
+                
+                <!-- 
+                    Navigation principale
+                    Balise sémantique <nav> pour accessibilité
+                -->
+                <nav>
+                    <!-- 
+                        Liste de liens de navigation
+                        CSS transforme en menu horizontal
+                    -->
+                    <ul>
+                        <!-- Lien vers page d'accueil -->
+                        <li><a href="index.html">Accueil</a></li>
+                        
+                        <!-- Lien vers page des films -->
+                        <li><a href="movies.html">Films</a></li>
+                        
+                        <!-- 
+                            Lien vers page des séries (page actuelle)
+                            class="active" = style CSS spécial
+                            Indication visuelle : couleur rouge + soulignement
+                            Montre à l'utilisateur où il se trouve
+                        -->
+                        <li><a href="series.html" class="active">Séries</a></li>
+                        
+                        <!-- Lien vers page des favoris -->
+                        <li><a href="favorites.html">Favoris</a></li>
+                    </ul>
+                </nav>
+                
+                <!-- 
+                    Conteneur de la barre de recherche
+                    Position relative en CSS pour dropdown en absolute
+                -->
+                <div class="search-container">
+                    <!-- 
+                        Input de recherche
+                        id="searchInput" = ciblé par JavaScript (search.js)
+                        Écoute l'événement keyup pour recherche instantanée
+                        Recherche dans films ET séries simultanément
+                    -->
+                    <input type="text" id="searchInput" placeholder="Rechercher un film ou une série...">
+                    
+                    <!-- 
+                        Conteneur des résultats de recherche
+                        Vide par défaut, rempli dynamiquement par JavaScript
+                        Affiche films et séries mélangés par pertinence
+                        Affiché en dropdown (position absolute) sous l'input
+                    -->
+                    <div id="searchResults" class="search-results"></div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 
+        ============================================
+        MAIN (CONTENU PRINCIPAL)
+        ============================================
+        Balise sémantique pour le contenu principal de la page
+        Une seule balise <main> par page
+    -->
+    <main>
+        <!-- 
+            ============================================
+            SECTION : GRILLE DES SÉRIES
+            ============================================
+            Section unique de cette page
+            Affiche toutes les séries TV disponibles avec pagination
+            
+            Flux de données :
+            1. Chargement de la page HTML
+            2. Exécution de series.js (module ES6)
+            3. Appel API TMDB : GET /discover/tv?page=1
+            4. Réception JSON avec 20 séries + infos de pagination
+            5. Création de 20 cartes HTML
+            6. Injection dans #seriesGrid
+            7. Configuration des boutons de pagination
+            
+            Réponse API TMDB pour séries (structure) :
+            {
+              "page": 1,
+              "results": [
+                {
+                  "id": 1399,
+                  "name": "Game of Thrones",              // "name" au lieu de "title"
+                  "original_name": "Game of Thrones",
+                  "poster_path": "/u3bZgnGQ9T01sWNhyveQz0wH0Hl.jpg",
+                  "backdrop_path": "/mUkuc2wyV9dHLG0D0Loaw5pO2s8.jpg",
+                  "overview": "Il y a très longtemps...",
+                  "first_air_date": "2011-04-17",       // "first_air_date" au lieu de "release_date"
+                  "vote_average": 8.442,
+                  "vote_count": 22074,
+                  "genre_ids": [10765, 18, 10759],
+                  "origin_country": ["US"],
+                  "popularity": 369.594
+                },
+                // ... 19 autres séries
+              ],
+              "total_pages": 500,
+              "total_results": 10000
+            }
+            
+            Différences avec films :
+            - Champ "name" au lieu de "title"
+            - Champ "first_air_date" au lieu de "release_date"
+            - Champ "origin_country" (tableau de pays)
+            - Pas de champ "runtime" (varie par épisode)
+            
+            Interaction utilisateur :
+            - Clic sur carte → Redirection vers detail.html?id=1399&type=tv
+            - Clic sur bouton ❤️ → Ajout/retrait des favoris (localStorage)
+            - Clic sur "Suivant" → Chargement page 2
+            - Clic sur "Précédent" → Retour page 1
+            
+            Types de séries :
+            - Scripted (scénario) : dramas, comédies, thrillers
+            - Reality : télé-réalité, documentaires
+            - Talk Shows : interviews, débats
+            - Animated : dessins animés, anime
+            - News : actualités, journaux
+        -->
+        <section class="section">
+            <!-- Container pour centrer le contenu -->
+            <div class="container">
+                <!-- 
+                    Titre de la page
+                    Classe .page-title = style spécifique pour titres de pages
+                    Plus grand et plus espacé que .section-title
+                -->
+                <h2 class="page-title">Toutes les Séries</h2>
+                
+                <!-- 
+                    Grille de séries TV
+                    
+                    Attributs :
+                    - id="seriesGrid" = ciblé par JavaScript pour injection dynamique
+                    - class="media-grid" = grille CSS responsive (identique aux films)
+                    
+                    CSS Grid configuration (partagée avec films) :
+                    display: grid;
+                    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                    gap: 1.5rem;
+                    
+                    Comportement responsive :
+                    - Desktop (1200px+) : 5-6 cartes par ligne
+                    - Tablette (768px) : 3-4 cartes par ligne
+                    - Mobile (480px) : 2 cartes par ligne
+                    - Smartphone (320px) : 1-2 cartes par ligne
+                    
+                    Contenu dynamique :
+                    - Message "Chargement..." par défaut
+                    - Remplacé par 20 cartes une fois les données reçues
+                    - Chaque carte contient :
+                      * Image poster de la série (300x450px)
+                      * Nom de la série (champ "name")
+                      * Note avec étoile (⭐ 8.4/10)
+                      * Bouton favori (❤️ ou 🤍 selon état)
+                      * Badge "SÉRIE" pour différencier des films (optionnel)
+                      * Lien cliquable vers page de détails
+                    
+                    Gestion des images manquantes :
+                    - Si poster_path = null → Image placeholder
+                    - Image par défaut : icône "no image available"
+                    - Même dimensions pour cohérence visuelle
+                -->
+                <div id="seriesGrid" class="media-grid">
+                    <!-- 
+                        Message de chargement par défaut
+                        Classe .loading = style CSS (centré, gris, padding)
+                        Affiché pendant l'appel API (quelques millisecondes)
+                        Supprimé par JavaScript dès réception des données
+                    -->
+                    <div class="loading">Chargement...</div>
+                </div>
+                <!-- 
+                    ============================================
+                    PAGINATION
+                    ============================================
+                    Système de navigation entre les pages de séries
+                    Fonctionnement identique à la page films
+                    
+                    Structure : [Précédent] [Page X] [Suivant]
+                    
+                    Comportement dynamique géré par JavaScript (series.js) :
+                    
+                    1. BOUTON "PRÉCÉDENT" :
+                       - Désactivé (disabled) sur page 1
+                       - Actif sur pages 2+
+                       - Clic : currentPage-- puis nouvel appel API
+                       - Scroll automatique en haut de page (smooth)
+                       - Icône ← (flèche gauche) pour direction visuelle
+                    
+                    2. INDICATEUR "PAGE X" :
+                       - Affiche le numéro de page actuelle
+                       - Mis à jour après chaque changement de page
+                       - Format : "Page 1", "Page 2", etc.
+                       - Optionnel : "Page X sur Y" (si total_pages connu)
+                       - Style : texte en gras (font-weight: bold)
+                    
+                    3. BOUTON "SUIVANT" :
+                       - Actif tant qu'il reste des pages
+                       - Désactivé si page actuelle = dernière page
+                       - Clic : currentPage++ puis nouvel appel API
+                       - Scroll automatique en haut de page (smooth)
+                       - Icône → (flèche droite) pour direction visuelle
+                    
+                    Gestion de l'état :
+                    - Variable JavaScript : currentPage = 1 (initial)
+                    - Incrémentée/décrémentée selon navigation
+                    - Pas de persistance (retour à page 1 au rechargement)
+                    - Total de pages reçu dans réponse API (total_pages)
+                    
+                    Logique de désactivation :
+                    - prevBtn.disabled = (currentPage === 1)
+                    - nextBtn.disabled = (currentPage >= totalPages)
+                    - CSS applique opacity: 0.5 + cursor: not-allowed
+                    
+                    Optimisations UX :
+                    - Feedback visuel immédiat (loading)
+                    - Scroll smooth vers le haut après changement
+                    - Boutons clairs et grands (faciles à cliquer)
+                    - États disabled bien visibles
+                    - Touches clavier supportées (optionnel : ←/→)
+                    
+                    Architecture JavaScript :
+                    - Classe SeriesPage avec méthode loadSeries(page)
+                    - Event listeners sur boutons
+                    - Méthode updatePagination() pour états
+                    - Appel API avec paramètre page
+                    
+                    Alternatives de pagination :
+                    - Infinite scroll (chargement automatique au scroll)
+                    - Numéros cliquables (1, 2, 3, ..., 10)
+                    - "Charger plus" (append au lieu de replace)
+                    - Sélecteur de page (input number)
+                    - URL avec query string (?page=2)
+                -->
+                <div class="pagination">
+                    <!-- 
+                        Bouton "Précédent"
+                        
+                        Attributs :
+                        - id="prevPage" = ciblé par JavaScript pour addEventListener
+                        - class="btn-pagination" = style CSS des boutons de pagination
+                        
+                        Icône :
+                        - ← = flèche gauche (entité HTML : &larr;)
+                        - Indique direction de navigation (retour en arrière)
+                        
+                        JavaScript associé :
+                        prevPage.addEventListener('click', () => {
+                          if (this.currentPage > 1) {
+                            this.currentPage--;
+                            this.loadSeries(this.currentPage);
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                          }
+                        });
+                        
+                        État initial :
+                        - Désactivé sur page 1 (prevPage.disabled = true)
+                        - JavaScript applique cet état au chargement
+                    -->
+                    <button id="prevPage" class="btn-pagination">← Précédent</button>
+                    
+                    <!-- 
+                        Indicateur de page
+                        
+                        Balise <span> = inline (pas de nouvelle ligne)
+                        id="pageInfo" = mis à jour dynamiquement par JavaScript
+                        
+                        Contenu dynamique :
+                        - Par défaut : "Page 1"
+                        - Après navigation : "Page 2", "Page 3", etc.
+                        - Code JS : pageInfo.textContent = `Page ${this.currentPage}`
+                        
+                        Variantes possibles :
+                        - "Page 1 sur 500" (avec total)
+                        - "1 / 500" (format court)
+                        - "Page 1 (10 000 résultats)" (avec nombre de séries)
+                        
+                        Style CSS :
+                        - font-size: 1.2rem (plus grand)
+                        - font-weight: bold (en gras)
+                        - Centré entre les deux boutons
+                    -->
+                    <span id="pageInfo">Page 1</span>
+                    
+                    <!-- 
+                        Bouton "Suivant"
+                        
+                        Attributs :
+                        - id="nextPage" = ciblé par JavaScript
+                        - class="btn-pagination" = style CSS identique à Précédent
+                        
+                        Icône :
+                        - → = flèche droite (entité HTML : &rarr;)
+                        - Indique direction de navigation (avancer)
+                        
+                        JavaScript associé :
+                        nextPage.addEventListener('click', () => {
+                          if (this.currentPage < this.totalPages) {
+                            this.currentPage++;
+                            this.loadSeries(this.currentPage);
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                          }
+                        });
+                        
+                        État initial :
+                        - Actif au départ (il y a toujours des pages suivantes)
+                        - Désactivé uniquement si currentPage === totalPages
+                    -->
+                    <button id="nextPage" class="btn-pagination">Suivant →</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 
+        ============================================
+        FOOTER (PIED DE PAGE)
+        ============================================
+        Footer identique sur toutes les pages
+    -->
+    <footer>
+        <!-- Container pour centrer le contenu -->
+        <div class="container">
+            <!-- 
+                Copyright et attribution TMDB
+                &copy; = entité HTML pour symbole © (copyright)
+                Attribution obligatoire selon conditions TMDB API
+            -->
+            <p>&copy; 2025 Cinetech. Données fournies par TMDB.</p>
+        </div>
+    </footer>
+
+    <!-- 
+        ============================================
+        SCRIPT JAVASCRIPT - MODULE ES6
+        ============================================
+        Chargement du fichier JavaScript spécifique à la page séries
+        
+        type="module" = Active le mode module ES6
+        Avantages :
+        - Import/export de modules
+        - Mode strict automatique
+        - Chargement différé (defer)
+        - Portée isolée (pas de pollution globale)
+        
+        Fichier series.js contient la classe SeriesPage :
+        
+        ============================================
+        ARCHITECTURE DU CODE (series.js)
+        ============================================
+        
+        1. IMPORTS DE MODULES
+           import { config } from './config.js'
+           import { API } from './api.js'
+           import { StorageManager } from './storage.js'
+           import { UIManager } from './ui.js'
+           import { initSearch } from './search.js'
+           
+        2. CLASSE SERIESPAGE
+           class SeriesPage {
+             constructor() {
+               this.currentPage = 1;        // Page actuelle
+               this.totalPages = 0;          // Total de pages disponibles
+               this.api = new API();         // Instance API
+               this.ui = new UIManager();    // Instance UI
+               this.storage = new StorageManager(); // Gestion favoris
+             }
+           }
+           
+        3. MÉTHODE INIT (INITIALISATION)
+           async init() {
+             // Charge la première page de séries
+             await this.loadSeries(1);
+             
+             // Configure les écouteurs d'événements
+             this.setupEventListeners();
+             
+             // Initialise la recherche
+             initSearch();
+           }
+           
+        4. MÉTHODE LOADSERIES (CHARGEMENT DES SÉRIES)
+           async loadSeries(page) {
+             // Affiche le loading
+             this.ui.showLoading('#seriesGrid');
+             
+             try {
+               // Appel API TMDB pour séries
+               const data = await this.api.getPopularSeries(page);
+               
+               // Extraction des données
+               this.totalPages = data.total_pages;
+               const series = data.results;
+               
+               // Création des cartes HTML
+               const container = document.getElementById('seriesGrid');
+               container.innerHTML = '';
+               
+               series.forEach(serie => {
+                 // IMPORTANT : type="tv" au lieu de "movie"
+                 const card = this.ui.createMediaCard(serie, 'tv');
+                 container.appendChild(card);
+               });
+               
+               // Mise à jour de la pagination
+               this.updatePagination();
+               
+             } catch (error) {
+               console.error('Erreur chargement séries:', error);
+               this.ui.showError('#seriesGrid', 'Erreur de chargement');
+             }
+           }
+           
+        5. MÉTHODE UPDATEPAGINATION (MAJ PAGINATION)
+           updatePagination() {
+             const prevBtn = document.getElementById('prevPage');
+             const nextBtn = document.getElementById('nextPage');
+             const pageInfo = document.getElementById('pageInfo');
+             
+             // Mise à jour du texte
+             pageInfo.textContent = `Page ${this.currentPage}`;
+             
+             // Gestion bouton Précédent
+             prevBtn.disabled = (this.currentPage === 1);
+             
+             // Gestion bouton Suivant
+             nextBtn.disabled = (this.currentPage >= this.totalPages);
+           }
+           
+        6. MÉTHODE SETUPEVENTLISTENERS (ÉCOUTEURS)
+           setupEventListeners() {
+             // Bouton Précédent
+             document.getElementById('prevPage').addEventListener('click', () => {
+               if (this.currentPage > 1) {
+                 this.currentPage--;
+                 this.loadSeries(this.currentPage);
+                 window.scrollTo({ top: 0, behavior: 'smooth' });
+               }
+             });
+             
+             // Bouton Suivant
+             document.getElementById('nextPage').addEventListener('click', () => {
+               if (this.currentPage < this.totalPages) {
+                 this.currentPage++;
+                 this.loadSeries(this.currentPage);
+                 window.scrollTo({ top: 0, behavior: 'smooth' });
+               }
+             });
+             
+             // Délégation d'événements pour boutons favoris
+             document.addEventListener('click', (e) => {
+               if (e.target.classList.contains('favorite-btn')) {
+                 this.handleFavoriteClick(e.target);
+               }
+             });
+           }
+           
+        7. MÉTHODE HANDLEFAVORITECLICK (FAVORIS)
+           handleFavoriteClick(button) {
+             const card = button.closest('.media-card');
+             const mediaId = card.dataset.id;
+             const mediaType = 'tv';  // Type "tv" pour séries
+             
+             // Toggle favori
+             if (this.storage.isFavorite(mediaId)) {
+               this.storage.removeFavorite(mediaId);
+               button.classList.remove('active');
+             } else {
+               const mediaData = {
+                 id: mediaId,
+                 type: 'tv',  // IMPORTANT : "tv" pas "movie"
+                 name: card.querySelector('h3').textContent,
+                 poster_path: card.querySelector('img').src,
+                 vote_average: parseFloat(card.dataset.rating)
+               };
+               this.storage.addFavorite(mediaData);
+               button.classList.add('active');
+             }
+           }
+           
+        8. INSTANCIATION ET LANCEMENT
+           const seriesPage = new SeriesPage();
+           seriesPage.init();
+           
+        ============================================
+        APPELS API TMDB POUR SÉRIES
+        ============================================
+        
+        Endpoint utilisé : /discover/tv
+        
+        URL complète :
+        https://api.themoviedb.org/v3/discover/tv
+          ?api_key=VOTRE_CLE
+          &language=fr-FR
+          &sort_by=popularity.desc
+          &page=1
+          &include_adult=false
+        
+        Paramètres :
+        - api_key : Clé d'authentification TMDB
+        - language : fr-FR pour contenu en français
+        - sort_by : popularity.desc (du plus au moins populaire)
+        - page : Numéro de page (1-500)
+        - include_adult : false (pas de contenu adulte)
+        
+        Réponse JSON :
+        {
+          "page": 1,
+          "results": [
+            {
+              "id": 1399,
+              "name": "Game of Thrones",          // "name" pas "title"
+              "original_name": "Game of Thrones",
+              "poster_path": "/u3bZgnGQ9T01sWNhyveQz0wH0Hl.jpg",
+              "backdrop_path": "/mUkuc2wyV9dHLG0D0Loaw5pO2s8.jpg",
+              "overview": "Il y a très longtemps, à une époque...",
+              "first_air_date": "2011-04-17",   // "first_air_date" pas "release_date"
+              "vote_average": 8.442,
+              "vote_count": 22074,
+              "genre_ids": [10765, 18, 10759],
+              "origin_country": ["US"],          // Pays d'origine
+              "original_language": "en",
+              "popularity": 369.594
+            },
+            // ... 19 autres séries
+          ],
+          "total_pages": 500,
+          "total_results": 10000
+        }
+        
+        Différences clés avec films :
+        - Champ "name" au lieu de "title"
+        - Champ "first_air_date" au lieu de "release_date"
+        - Champ "origin_country" (tableau)
+        - Pas de "runtime" (varie par épisode)
+        
+        Construction URL image (identique aux films) :
+        Base URL : https://image.tmdb.org/t/p/
+        Taille : w500 (500px de large)
+        Path : /u3bZgnGQ9T01sWNhyveQz0wH0Hl.jpg
+        URL finale : https://image.tmdb.org/t/p/w500/u3bZgnGQ9T01sWNhyveQz0wH0Hl.jpg
+        
+        ============================================
+        DIFFÉRENCES AVEC MOVIES.JS
+        ============================================
+        
+        Code presque identique, sauf :
+        
+        1. Appel API différent :
+           - movies.js : api.getPopularMovies(page)
+           - series.js : api.getPopularSeries(page)
+        
+        2. Type de média :
+           - movies.js : type = "movie"
+           - series.js : type = "tv"
+        
+        3. Champs de données :
+           - movies.js : utilise "title" et "release_date"
+           - series.js : utilise "name" et "first_air_date"
+        
+        4. URL de détails :
+           - movies.js : detail.html?id=550&type=movie
+           - series.js : detail.html?id=1399&type=tv
+        
+        5. Sélecteur DOM :
+           - movies.js : #moviesGrid
+           - series.js : #seriesGrid
+        
+        Le reste du code est identique (réutilisation maximale)
+        
+        ============================================
+        PERFORMANCES ET OPTIMISATIONS
+        ============================================
+        
+        1. Code partagé avec movies.js :
+           - Même classe API
+           - Même classe UIManager
+           - Même classe StorageManager
+           - Même module search
+        
+        2. Chargement asynchrone :
+           - Interface non bloquée
+           - Message de chargement visible
+           - Transitions fluides
+        
+        3. Gestion des erreurs :
+           - try/catch pour appels API
+           - Messages d'erreur utilisateur
+           - Fallback en cas d'échec
+        
+        4. Optimisation images :
+           - Lazy loading (optionnel)
+           - Cache navigateur
+           - Format optimisé (WebP supporté par TMDB)
+        
+        5. Délégation d'événements :
+           - Un seul listener sur document
+           - Pas de listener par carte (économie mémoire)
+    -->
+    <script type="module" src="js/series.js"></script>
+</body>
+</html>

@@ -1,0 +1,646 @@
+<!-- 
+    ============================================
+    PAGE FILMS - CINETECH
+    ============================================
+    Page dédiée à l'affichage de tous les films disponibles
+    
+    Caractéristiques :
+    - Affichage des films populaires par pages (20 films par page)
+    - Système de pagination complet (Précédent / Suivant)
+    - Numérotation des pages (Page 1, Page 2, etc.)
+    - Navigation infinie (TMDB propose des milliers de pages)
+    - Boutons désactivés selon contexte :
+      * "Précédent" désactivé sur page 1
+      * "Suivant" désactivé sur dernière page (si applicable)
+    
+    Source des données :
+    - API TMDB (The Movie Database)
+    - Endpoint : /discover/movie?page=X
+    - Paramètres :
+      * language=fr-FR (contenu en français)
+      * sort_by=popularity.desc (tri par popularité)
+      * page=X (numéro de page)
+    
+    Fonctionnalités :
+    - Cartes de films cliquables vers page de détails
+    - Bouton favori sur chaque carte (❤️)
+    - Note affichée avec étoile (⭐)
+    - Images poster en haute qualité
+    - Recherche disponible via header
+    - Responsive (s'adapte à tous les écrans)
+    
+    Gestion de l'état :
+    - Variable currentPage stockée en JavaScript
+    - URL ne change pas (pas de query string)
+    - Pas de sauvegarde de la page en localStorage
+    - Retour à la page 1 à chaque rechargement
+-->
+
+<!-- Déclaration du type de document HTML5 -->
+<!DOCTYPE html>
+
+<!-- 
+    Élément racine HTML
+    lang="fr" = langue française pour accessibilité et SEO
+-->
+<html lang="fr">
+
+<head>
+    <!-- 
+        ============================================
+        EN-TÊTE DU DOCUMENT (métadonnées)
+        ============================================
+    -->
+    
+    <!-- 
+        Encodage UTF-8
+        Permet affichage correct des caractères accentués et emojis
+    -->
+    <meta charset="UTF-8">
+    
+    <!-- 
+        Configuration responsive
+        width=device-width = largeur adaptative à l'appareil
+        initial-scale=1.0 = zoom par défaut à 100%
+        Crucial pour affichage mobile correct
+    -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- 
+        Titre de la page
+        Affiché dans l'onglet du navigateur
+        Important pour SEO et UX
+    -->
+    <title>Films - Cinetech</title>
+    
+    <!-- 
+        Lien vers feuille de style CSS
+        Contient tous les styles visuels de l'application
+    -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<!-- 
+    Corps du document
+    Contient tout le contenu visible de la page
+-->
+<body>
+    <!-- 
+        ============================================
+        HEADER (EN-TÊTE) - Navigation principale
+        ============================================
+        Header sticky identique sur toutes les pages
+        Reste visible en haut lors du scroll (position: sticky en CSS)
+    -->
+    <header>
+        <!-- 
+            Container centralisé
+            Classe CSS réutilisable qui :
+            - Centre le contenu horizontalement
+            - Limite la largeur maximale
+            - Ajoute du padding latéral
+        -->
+        <div class="container">
+            <!-- 
+                Conteneur flexbox pour disposition horizontale
+                CSS : display: flex + justify-content: space-between
+                Organisation : Logo | Navigation | Recherche
+            -->
+            <div class="header-content">
+                <!-- 
+                    Logo Cinetech
+                    H1 = titre principal pour SEO
+                    🎬 = emoji cinéma pour identité visuelle
+                    Lien vers page d'accueil (convention UX)
+                -->
+                <h1 class="logo"><a href="index.html">🎬 Cinetech</a></h1>
+                
+                <!-- 
+                    Navigation principale
+                    Balise sémantique <nav> pour accessibilité
+                -->
+                <nav>
+                    <!-- 
+                        Liste de liens de navigation
+                        CSS transform en menu horizontal
+                    -->
+                    <ul>
+                        <!-- Lien vers page d'accueil -->
+                        <li><a href="index.html">Accueil</a></li>
+                        
+                        <!-- 
+                            Lien vers page des films (page actuelle)
+                            class="active" = style CSS spécial
+                            Indication visuelle : couleur rouge + soulignement
+                            Montre à l'utilisateur où il se trouve
+                        -->
+                        <li><a href="movies.html" class="active">Films</a></li>
+                        
+                        <!-- Lien vers page des séries -->
+                        <li><a href="series.html">Séries</a></li>
+                        
+                        <!-- Lien vers page des favoris -->
+                        <li><a href="favorites.html">Favoris</a></li>
+                    </ul>
+                </nav>
+                
+                <!-- 
+                    Conteneur de la barre de recherche
+                    Position relative en CSS pour dropdown en absolute
+                -->
+                <div class="search-container">
+                    <!-- 
+                        Input de recherche
+                        id="searchInput" = ciblé par JavaScript (search.js)
+                        Écoute l'événement keyup pour recherche instantanée
+                        placeholder = texte indicatif gris
+                    -->
+                    <input type="text" id="searchInput" placeholder="Rechercher un film ou une série...">
+                    
+                    <!-- 
+                        Conteneur des résultats de recherche
+                        Vide par défaut, rempli dynamiquement par JavaScript
+                        Affiché en dropdown (position absolute) sous l'input
+                    -->
+                    <div id="searchResults" class="search-results"></div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 
+        ============================================
+        MAIN (CONTENU PRINCIPAL)
+        ============================================
+        Balise sémantique pour le contenu principal de la page
+        Une seule balise <main> par page
+    -->
+    <main>
+        <!-- 
+            ============================================
+            SECTION : GRILLE DES FILMS
+            ============================================
+            Section unique de cette page
+            Affiche tous les films disponibles avec pagination
+            
+            Flux de données :
+            1. Chargement de la page HTML
+            2. Exécution de movies.js (module ES6)
+            3. Appel API TMDB : GET /discover/movie?page=1
+            4. Réception JSON avec 20 films + infos de pagination
+            5. Création de 20 cartes HTML
+            6. Injection dans #moviesGrid
+            7. Configuration des boutons de pagination
+            
+            Réponse API TMDB (structure) :
+            {
+              "page": 1,
+              "results": [
+                {
+                  "id": 550,
+                  "title": "Fight Club",
+                  "poster_path": "/pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg",
+                  "vote_average": 8.4,
+                  "release_date": "1999-10-15",
+                  "overview": "Un employé de bureau..."
+                },
+                // ... 19 autres films
+              ],
+              "total_pages": 500,
+              "total_results": 10000
+            }
+            
+            Interaction utilisateur :
+            - Clic sur carte → Redirection vers detail.html?id=550&type=movie
+            - Clic sur bouton ❤️ → Ajout/retrait des favoris (localStorage)
+            - Clic sur "Suivant" → Chargement page 2
+            - Clic sur "Précédent" → Retour page 1
+        -->
+        <section class="section">
+            <!-- Container pour centrer le contenu -->
+            <div class="container">
+                <!-- 
+                    Titre de la page
+                    Classe .page-title = style spécifique pour titres de pages
+                    (Plus grand et plus espacer que .section-title)
+                -->
+                <h2 class="page-title">Tous les Films</h2>
+                
+                <!-- 
+                    Grille de films
+                    
+                    Attributs :
+                    - id="moviesGrid" = ciblé par JavaScript pour injection dynamique
+                    - class="media-grid" = grille CSS responsive
+                    
+                    CSS Grid configuration :
+                    display: grid;
+                    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                    gap: 1.5rem;
+                    
+                    Explication CSS Grid :
+                    - repeat() = répète le pattern de colonnes
+                    - auto-fill = crée autant de colonnes que possible
+                    - minmax(200px, 1fr) = largeur min 200px, max 1 fraction de l'espace
+                    - Résultat : grille responsive automatique
+                      * Desktop (1200px+) : 5-6 cartes par ligne
+                      * Tablette (768px) : 3-4 cartes par ligne
+                      * Mobile (480px) : 2 cartes par ligne
+                    
+                    Contenu dynamique :
+                    - Message "Chargement..." par défaut
+                    - Remplacé par 20 cartes une fois les données reçues
+                    - Chaque carte contient :
+                      * Image poster (300x450px)
+                      * Titre du film
+                      * Note avec étoile (⭐ 8.4/10)
+                      * Bouton favori (❤️ ou 🤍 selon état)
+                      * Lien cliquable vers page de détails
+                -->
+                <div id="moviesGrid" class="media-grid">
+                    <!-- 
+                        Message de chargement par défaut
+                        Classe .loading = style CSS (centré, gris, padding)
+                        Affiché pendant l'appel API (quelques millisecondes)
+                        Supprimé par JavaScript dès réception des données
+                    -->
+                    <div class="loading">Chargement...</div>
+                </div>
+                <!-- 
+                    ============================================
+                    PAGINATION
+                    ============================================
+                    Système de navigation entre les pages de films
+                    Permet de parcourir les milliers de films de TMDB
+                    
+                    Structure : [Précédent] [Page X] [Suivant]
+                    
+                    Comportement dynamique géré par JavaScript (movies.js) :
+                    
+                    1. BOUTON "PRÉCÉDENT" :
+                       - Désactivé (disabled) sur page 1
+                       - Actif sur pages 2+
+                       - Clic : currentPage-- puis nouvel appel API
+                       - Scroll automatique en haut de page
+                    
+                    2. INDICATEUR "PAGE X" :
+                       - Affiche le numéro de page actuelle
+                       - Mis à jour après chaque changement
+                       - Peut afficher "Page X sur Y" (optionnel)
+                       - Texte en gras (font-weight: bold en CSS)
+                    
+                    3. BOUTON "SUIVANT" :
+                       - Actif tant qu'il reste des pages
+                       - Désactivé si page actuelle = dernière page
+                       - Clic : currentPage++ puis nouvel appel API
+                       - Scroll automatique en haut de page
+                    
+                    Gestion de l'état :
+                    - Variable JavaScript : currentPage = 1 (initial)
+                    - Incrémentée/décrémentée selon navigation
+                    - Pas de persistance (retour à page 1 au rechargement)
+                    
+                    Attribut :disabled (géré par JavaScript) :
+                    - button.disabled = true → Bouton gris et non cliquable
+                    - CSS : opacity: 0.5 + cursor: not-allowed
+                    
+                    Optimisations UX :
+                    - Chargement rapide (quelques ms)
+                    - Feedback visuel (loading pendant appel API)
+                    - Smooth scroll vers le haut
+                    - Touches clavier (optionnel : flèches gauche/droite)
+                    
+                    Alternatives possibles :
+                    - Infinite scroll (chargement automatique)
+                    - Numéros de pages cliquables (1, 2, 3, ...)
+                    - "Charger plus" (append au lieu de replace)
+                    - URL avec query string (?page=2)
+                -->
+                <div class="pagination">
+                    <!-- 
+                        Bouton "Précédent"
+                        
+                        Attributs :
+                        - id="prevPage" = ciblé par JavaScript pour addEventListener
+                        - class="btn-pagination" = style CSS des boutons de pagination
+                        
+                        Icône :
+                        - ← = flèche gauche (entité HTML : &larr;)
+                        - Indique direction de navigation
+                        
+                        JavaScript associe :
+                        prevPage.addEventListener('click', () => {
+                          if (currentPage > 1) {
+                            currentPage--;
+                            loadMovies(currentPage);
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                          }
+                        });
+                        
+                        État initial :
+                        - Désactivé (page 1)
+                        - JavaScript ajoute prevPage.disabled = true
+                    -->
+                    <button id="prevPage" class="btn-pagination">← Précédent</button>
+                    
+                    <!-- 
+                        Indicateur de page
+                        
+                        Balise <span> = inline, pas de nouvelle ligne
+                        id="pageInfo" = mis à jour par JavaScript
+                        
+                        Contenu dynamique :
+                        - Par défaut : "Page 1"
+                        - Après clic Suivant : "Page 2", "Page 3", etc.
+                        - JavaScript : pageInfo.textContent = `Page ${currentPage}`
+                        
+                        Variantes possibles :
+                        - "Page 1 sur 500"
+                        - "1 / 500"
+                        - "Page 1 (10 000 résultats)"
+                    -->
+                    <span id="pageInfo">Page 1</span>
+                    
+                    <!-- 
+                        Bouton "Suivant"
+                        
+                        Attributs :
+                        - id="nextPage" = ciblé par JavaScript
+                        - class="btn-pagination" = style CSS identique à Précédent
+                        
+                        Icône :
+                        - → = flèche droite (entité HTML : &rarr;)
+                        - Indique direction de navigation
+                        
+                        JavaScript associe :
+                        nextPage.addEventListener('click', () => {
+                          if (currentPage < totalPages) {
+                            currentPage++;
+                            loadMovies(currentPage);
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                          }
+                        });
+                        
+                        État initial :
+                        - Actif (il y a des pages suivantes)
+                        - Désactivé uniquement si currentPage === totalPages
+                    -->
+                    <button id="nextPage" class="btn-pagination">Suivant →</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 
+        ============================================
+        FOOTER (PIED DE PAGE)
+        ============================================
+        Footer identique sur toutes les pages
+    -->
+    <footer>
+        <!-- Container pour centrer le contenu -->
+        <div class="container">
+            <!-- 
+                Copyright et attribution TMDB
+                &copy; = entité HTML pour symbole © (copyright)
+                Attribution obligatoire selon conditions TMDB API
+            -->
+            <p>&copy; 2025 Cinetech. Données fournies par TMDB.</p>
+        </div>
+    </footer>
+
+    <!-- 
+        ============================================
+        SCRIPT JAVASCRIPT - MODULE ES6
+        ============================================
+        Chargement du fichier JavaScript spécifique à la page films
+        
+        type="module" = Active le mode module ES6
+        Avantages :
+        - Import/export de modules
+        - Mode strict automatique
+        - Chargement différé (defer)
+        - Portée isolée (pas de pollution globale)
+        
+        Fichier movies.js contient la classe MoviesPage :
+        
+        ============================================
+        ARCHITECTURE DU CODE (movies.js)
+        ============================================
+        
+        1. IMPORTS DE MODULES
+           import { config } from './config.js'
+           import { API } from './api.js'
+           import { StorageManager } from './storage.js'
+           import { UIManager } from './ui.js'
+           import { initSearch } from './search.js'
+           
+        2. CLASSE MOVIESPAGE
+           class MoviesPage {
+             constructor() {
+               this.currentPage = 1;        // Page actuelle
+               this.totalPages = 0;          // Total de pages disponibles
+               this.api = new API();         // Instance API
+               this.ui = new UIManager();    // Instance UI
+               this.storage = new StorageManager(); // Gestion favoris
+             }
+           }
+           
+        3. MÉTHODE INIT (INITIALISATION)
+           async init() {
+             // Charge la première page de films
+             await this.loadMovies(1);
+             
+             // Configure les écouteurs d'événements
+             this.setupEventListeners();
+             
+             // Initialise la recherche
+             initSearch();
+           }
+           
+        4. MÉTHODE LOADMOVIES (CHARGEMENT DES FILMS)
+           async loadMovies(page) {
+             // Affiche le loading
+             this.ui.showLoading('#moviesGrid');
+             
+             try {
+               // Appel API TMDB
+               const data = await this.api.getPopularMovies(page);
+               
+               // Extraction des données
+               this.totalPages = data.total_pages;
+               const movies = data.results;
+               
+               // Création des cartes HTML
+               const container = document.getElementById('moviesGrid');
+               container.innerHTML = '';
+               
+               movies.forEach(movie => {
+                 const card = this.ui.createMediaCard(movie, 'movie');
+                 container.appendChild(card);
+               });
+               
+               // Mise à jour de la pagination
+               this.updatePagination();
+               
+             } catch (error) {
+               console.error('Erreur:', error);
+               this.ui.showError('#moviesGrid', 'Erreur de chargement');
+             }
+           }
+           
+        5. MÉTHODE UPDATEPAGINATION (MAJ PAGINATION)
+           updatePagination() {
+             // Références DOM
+             const prevBtn = document.getElementById('prevPage');
+             const nextBtn = document.getElementById('nextPage');
+             const pageInfo = document.getElementById('pageInfo');
+             
+             // Mise à jour du texte
+             pageInfo.textContent = `Page ${this.currentPage}`;
+             
+             // Gestion du bouton Précédent
+             prevBtn.disabled = this.currentPage === 1;
+             
+             // Gestion du bouton Suivant
+             nextBtn.disabled = this.currentPage >= this.totalPages;
+           }
+           
+        6. MÉTHODE SETUPEVENTLISTENERS (ÉCOUTEURS)
+           setupEventListeners() {
+             // Bouton Précédent
+             document.getElementById('prevPage').addEventListener('click', () => {
+               if (this.currentPage > 1) {
+                 this.currentPage--;
+                 this.loadMovies(this.currentPage);
+                 window.scrollTo({ top: 0, behavior: 'smooth' });
+               }
+             });
+             
+             // Bouton Suivant
+             document.getElementById('nextPage').addEventListener('click', () => {
+               if (this.currentPage < this.totalPages) {
+                 this.currentPage++;
+                 this.loadMovies(this.currentPage);
+                 window.scrollTo({ top: 0, behavior: 'smooth' });
+               }
+             });
+             
+             // Délégation d'événements pour boutons favoris
+             document.addEventListener('click', (e) => {
+               if (e.target.classList.contains('favorite-btn')) {
+                 this.handleFavoriteClick(e.target);
+               }
+             });
+           }
+           
+        7. MÉTHODE HANDLEFAVORITECLICK (FAVORIS)
+           handleFavoriteClick(button) {
+             const card = button.closest('.media-card');
+             const mediaId = card.dataset.id;
+             const mediaType = 'movie';
+             
+             // Toggle favori
+             if (this.storage.isFavorite(mediaId)) {
+               this.storage.removeFavorite(mediaId);
+               button.classList.remove('active');
+             } else {
+               const mediaData = {
+                 id: mediaId,
+                 type: mediaType,
+                 title: card.querySelector('h3').textContent,
+                 poster_path: card.querySelector('img').src,
+                 vote_average: parseFloat(card.dataset.rating)
+               };
+               this.storage.addFavorite(mediaData);
+               button.classList.add('active');
+             }
+           }
+           
+        8. INSTANCIATION ET LANCEMENT
+           // Création de l'instance
+           const moviesPage = new MoviesPage();
+           
+           // Lancement au chargement du DOM
+           moviesPage.init();
+           
+        ============================================
+        APPELS API TMDB
+        ============================================
+        
+        Endpoint utilisé : /discover/movie
+        
+        URL complète :
+        https://api.themoviedb.org/v3/discover/movie
+          ?api_key=VOTRE_CLE
+          &language=fr-FR
+          &sort_by=popularity.desc
+          &page=1
+          &include_adult=false
+          &include_video=false
+        
+        Paramètres :
+        - api_key : Clé d'authentification TMDB
+        - language : fr-FR pour contenu en français
+        - sort_by : popularity.desc (du plus au moins populaire)
+        - page : Numéro de page (1-500)
+        - include_adult : false (pas de contenu adulte)
+        
+        Réponse JSON :
+        {
+          "page": 1,
+          "results": [
+            {
+              "id": 550,
+              "title": "Fight Club",
+              "original_title": "Fight Club",
+              "poster_path": "/pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg",
+              "backdrop_path": "/fCayJrkfRaCRCTh8GqN30f8oyQF.jpg",
+              "overview": "Le narrateur, employé d'une compagnie...",
+              "release_date": "1999-10-15",
+              "vote_average": 8.433,
+              "vote_count": 26280,
+              "genre_ids": [18, 53, 35],
+              "adult": false,
+              "popularity": 61.416
+            },
+            // ... 19 autres films
+          ],
+          "total_pages": 500,
+          "total_results": 10000
+        }
+        
+        Construction URL image :
+        Base URL : https://image.tmdb.org/t/p/
+        Taille : w500 (500px de large)
+        Path : /pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg
+        URL finale : https://image.tmdb.org/t/p/w500/pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg
+        
+        ============================================
+        PERFORMANCES ET OPTIMISATIONS
+        ============================================
+        
+        1. Chargement asynchrone (async/await)
+           - Interface non bloquée pendant l'appel API
+           - Message de chargement visible
+        
+        2. Lazy loading des images (optionnel)
+           - loading="lazy" sur balises <img>
+           - Images chargées uniquement si visibles
+        
+        3. Cache navigateur
+           - Images mises en cache automatiquement
+           - Chargement instantané si déjà visité
+        
+        4. Délégation d'événements
+           - Un seul listener sur document
+           - Pas de listener par carte (20 économisés)
+        
+        5. Gestion des erreurs
+           - try/catch pour appels API
+           - Messages d'erreur utilisateur
+           - Fallback en cas d'échec
+    -->
+    <script type="module" src="js/movies.js"></script>
+</body>
+</html>

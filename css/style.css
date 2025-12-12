@@ -1,0 +1,1782 @@
+/**
+ * Pseudo-classe :root représente l'élément racine du document (<html>)
+ * Utilisée pour définir des variables CSS (custom properties) globales
+ * Les variables CSS commencent par -- et peuvent être réutilisées partout
+ * Syntaxe: var(--nom-variable) pour les utiliser
+ */
+:root {
+    /* Couleur principale rouge Netflix - utilisée pour les boutons et accents */
+    --primary-color: #e50914;
+    
+    /* Couleur secondaire gris très foncé - utilisée pour les backgrounds du header */
+    --secondary-color: #141414;
+    
+    /* Couleur du texte principal - blanc pour contraste sur fond noir */
+    --text-color: #ffffff;
+    
+    /* Couleur du texte atténué/secondaire - gris clair pour infos moins importantes */
+    --text-muted: #b3b3b3;
+    
+    /* Couleur de fond principale - noir pur pour thème sombre */
+    --background: #000000;
+    
+    /* Couleur de fond des cartes - gris très foncé légèrement plus clair que le noir */
+    --card-background: #181818;
+    
+    /* Couleur de survol - gris moyen pour feedback visuel au hover */
+    --hover-color: #2a2a2a;
+    
+    /* Rayon de bordure standard - 8px pour coins arrondis uniformes */
+    --border-radius: 8px;
+    
+    /* Transition standard - toutes propriétés, 0.3 secondes, courbe ease (fluide) */
+    --transition: all 0.3s ease;
+}
+
+/**
+ * Sélecteur universel * : cible TOUS les éléments HTML
+ * Reset CSS pour supprimer les styles par défaut des navigateurs
+ * Garantit un rendu cohérent sur tous les navigateurs
+ */
+* {
+    /* Supprime les marges extérieures par défaut de tous les éléments */
+    margin: 0;
+    
+    /* Supprime les espacements intérieurs par défaut de tous les éléments */
+    padding: 0;
+    
+    /* border-box inclut padding et border dans la largeur/hauteur totale */
+    /* Par défaut c'est content-box (width = contenu seulement) */
+    /* Avec border-box, width = contenu + padding + border */
+    box-sizing: border-box;
+}
+
+/**
+ * Style du body : élément racine du contenu visible
+ * Définit les styles de base qui s'appliquent à toute la page
+ */
+body {
+    /* Stack de polices : essaie 'Segoe UI' puis fallbacks si non disponible */
+    /* sans-serif en dernier : police générique si aucune autre disponible */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    
+    /* Utilisation de la variable CSS pour le fond noir */
+    background-color: var(--background);
+    
+    /* Couleur du texte par défaut (blanc) via variable CSS */
+    color: var(--text-color);
+    
+    /* Hauteur de ligne 1.6 (160% de la taille de police) */
+    /* Améliore la lisibilité en espaçant les lignes de texte */
+    line-height: 1.6;
+}
+
+/**
+ * Container : classe réutilisable pour centrer et limiter la largeur du contenu
+ * Utilisée dans toutes les sections pour une mise en page cohérente
+ */
+.container {
+    /* Largeur maximale de 1400 pixels */
+    /* Sur écrans plus larges, le contenu ne s'étend pas infiniment */
+    max-width: 1400px;
+    
+    /* margin: 0 auto centre horizontalement le container */
+    /* 0 = marges haut/bas, auto = marges gauche/droite calculées automatiquement */
+    margin: 0 auto;
+    
+    /* Padding horizontal de 20px pour éviter que le contenu touche les bords */
+    /* 0 = padding haut/bas, 20px = padding gauche/droite */
+    padding: 0 20px;
+}
+
+/* ===== HEADER / EN-TÊTE ===== */
+/**
+ * Style du header : barre de navigation en haut de page
+ * Reste fixé en haut lors du scroll (sticky)
+ */
+header {
+    /* Fond gris très foncé pour le header */
+    background-color: var(--secondary-color);
+    
+    /* Padding vertical de 1rem (16px), pas de padding horizontal */
+    /* rem = relative à la taille de police racine (16px par défaut) */
+    padding: 1rem 0;
+    
+    /* position: sticky = reste en place lors du scroll jusqu'à un certain point */
+    /* Combine aspects de relative et fixed */
+    position: sticky;
+    
+    /* top: 0 = reste collé en haut de la fenêtre lors du scroll */
+    top: 0;
+    
+    /* z-index: 100 = empile le header au-dessus des autres éléments */
+    /* Plus la valeur est élevée, plus l'élément est "devant" */
+    z-index: 100;
+    
+    /* Ombre portée sous le header pour effet de profondeur */
+    /* horizontal vertical blur spread color */
+    /* 0 = pas de décalage horizontal, 2px vers le bas, 10px de flou */
+    /* rgba(0,0,0,0.5) = noir à 50% d'opacité */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+/**
+ * Contenu du header : utilise Flexbox pour disposition horizontale
+ * Contient le logo, navigation et barre de recherche
+ */
+.header-content {
+    /* display: flex active le système de disposition Flexbox */
+    /* Les enfants deviennent des flex items disposés en ligne */
+    display: flex;
+    
+    /* Distribue l'espace entre les éléments */
+    /* space-between : premier élément à gauche, dernier à droite, espace égal entre */
+    justify-content: space-between;
+    
+    /* Aligne verticalement les éléments au centre de leur ligne */
+    align-items: center;
+    
+    /* Espace de 2rem (32px) entre chaque élément flex */
+    gap: 2rem;
+    
+    /* flex-wrap: wrap permet aux éléments de passer à la ligne si pas assez d'espace */
+    /* Important pour le responsive (écrans petits) */
+    flex-wrap: wrap;
+}
+
+/**
+ * Style du logo : lien cliquable vers la page d'accueil
+ * Sélecteur .logo a cible les liens <a> à l'intérieur de .logo
+ */
+.logo a {
+    /* Couleur rouge Netflix pour le logo */
+    color: var(--primary-color);
+    
+    /* Supprime le soulignement par défaut des liens */
+    text-decoration: none;
+    
+    /* Taille de police 1.8rem (28.8px) - plus grand que le texte normal */
+    font-size: 1.8rem;
+    
+    /* Texte en gras pour le logo */
+    font-weight: bold;
+}
+
+/**
+ * Liste de navigation : menu horizontal
+ * nav ul cible la liste <ul> dans l'élément <nav>
+ */
+nav ul {
+    /* Flexbox pour disposer les items de menu horizontalement */
+    display: flex;
+    
+    /* Supprime les puces (•) par défaut des listes */
+    list-style: none;
+    
+    /* Espace de 2rem entre chaque item de menu */
+    gap: 2rem;
+}
+
+/**
+ * Liens de navigation : items du menu
+ * nav a cible tous les liens dans la navigation
+ */
+nav a {
+    /* Couleur blanche pour les liens */
+    color: var(--text-color);
+    
+    /* Pas de soulignement pour les liens */
+    text-decoration: none;
+    
+    /* Transition douce sur tous les changements (couleur, etc.) */
+    /* Utilise la variable --transition définie (0.3s ease) */
+    transition: var(--transition);
+    
+    /* font-weight: 500 = poids moyen (entre normal 400 et bold 700) */
+    font-weight: 500;
+}
+
+/**
+ * État hover et actif des liens de navigation
+ * :hover = au survol de la souris
+ * .active = classe ajoutée au lien de la page actuelle
+ * La virgule signifie "OU" : applique le style aux deux cas
+ */
+nav a:hover,
+nav a.active {
+    /* Change la couleur en rouge au survol ou si lien actif */
+    color: var(--primary-color);
+}
+
+/* ===== SEARCH / BARRE DE RECHERCHE ===== */
+/**
+ * Conteneur de la recherche : englobe l'input et les résultats
+ * Positionné en relative pour permettre le positionnement absolu des résultats
+ */
+.search-container {
+    /* position: relative sert de référence pour les enfants en position absolute */
+    position: relative;
+    
+    /* flex: 1 permet à l'élément de s'étendre pour remplir l'espace disponible */
+    /* Équivalent à flex-grow: 1, flex-shrink: 1, flex-basis: 0 */
+    flex: 1;
+    
+    /* Largeur maximale de 400px pour ne pas être trop large */
+    max-width: 400px;
+}
+
+/**
+ * Champ de recherche : input texte pour saisir la recherche
+ * # = sélecteur d'ID, cible l'élément avec id="searchInput"
+ */
+#searchInput {
+    /* Prend 100% de la largeur du conteneur parent */
+    width: 100%;
+    
+    /* Padding : 0.8rem vertical (12.8px), 1rem horizontal (16px) */
+    /* Crée de l'espace à l'intérieur du champ pour le texte */
+    padding: 0.8rem 1rem;
+    
+    /* Fond gris foncé pour le champ de saisie */
+    background-color: var(--card-background);
+    
+    /* Bordure fine gris foncé autour du champ */
+    /* 1px = épaisseur, solid = ligne continue, #333 = gris foncé */
+    border: 1px solid #333;
+    
+    /* Coins arrondis de 8px */
+    border-radius: var(--border-radius);
+    
+    /* Couleur du texte saisi (blanc) */
+    color: var(--text-color);
+    
+    /* Taille de la police du texte saisi */
+    font-size: 1rem;
+}
+
+/**
+ * État focus du champ de recherche
+ * :focus = quand l'utilisateur clique dans le champ (champ actif)
+ * Améliore le feedback visuel pour l'utilisateur
+ */
+#searchInput:focus {
+    /* Supprime le contour bleu par défaut du navigateur */
+    /* outline: none retire la bordure de focus native */
+    outline: none;
+    
+    /* Change la couleur de bordure en rouge lors du focus */
+    /* Indique visuellement que le champ est actif */
+    border-color: var(--primary-color);
+}
+
+/**
+ * Conteneur des résultats de recherche : dropdown d'autocomplétion
+ * Positionné en absolu sous le champ de recherche
+ */
+.search-results {
+    /* position: absolute sort du flux normal du document */
+    /* Positionné par rapport au parent en position: relative (.search-container) */
+    position: absolute;
+    
+    /* top: 100% positionne le haut de l'élément juste en dessous du parent */
+    /* 100% = hauteur totale du parent */
+    top: 100%;
+    
+    /* Aligné à gauche avec le parent */
+    left: 0;
+    
+    /* Aligné à droite avec le parent - prend toute la largeur */
+    /* left: 0 + right: 0 = s'étend sur toute la largeur du parent */
+    right: 0;
+    
+    /* Fond gris foncé pour le dropdown */
+    background-color: var(--card-background);
+    
+    /* Bordure autour du dropdown */
+    border: 1px solid #333;
+    
+    /* Coins arrondis pour le dropdown */
+    border-radius: var(--border-radius);
+    
+    /* Marge en haut pour espacer du champ de recherche */
+    margin-top: 0.5rem;
+    
+    /* Hauteur maximale de 400px pour ne pas être trop long */
+    max-height: 400px;
+    
+    /* overflow-y: auto ajoute une scrollbar verticale si le contenu dépasse */
+    /* auto = scrollbar seulement si nécessaire */
+    overflow-y: auto;
+    
+    /* Caché par défaut - sera affiché avec la classe .active */
+    display: none;
+    
+    /* z-index élevé pour apparaître au-dessus de tout le contenu */
+    z-index: 1000;
+}
+
+/**
+ * État actif des résultats de recherche
+ * Classe .active ajoutée dynamiquement en JavaScript quand il y a des résultats
+ */
+.search-results.active {
+    /* Affiche le dropdown en mode block (prend toute la largeur) */
+    display: block;
+}
+
+/**
+ * Item individuel de résultat de recherche
+ * Chaque résultat affiché dans le dropdown d'autocomplétion
+ */
+.search-item {
+    /* Flexbox pour aligner l'image et les infos horizontalement */
+    display: flex;
+    
+    /* Espace de 1rem entre l'image et les infos textuelles */
+    gap: 1rem;
+    
+    /* Padding de 1rem sur tous les côtés pour l'espacement interne */
+    padding: 1rem;
+    
+    /* cursor: pointer change le curseur en main au survol */
+    /* Indique que l'élément est cliquable */
+    cursor: pointer;
+    
+    /* Transition douce pour les changements de couleur au hover */
+    transition: var(--transition);
+    
+    /* Bordure en bas pour séparer les résultats */
+    border-bottom: 1px solid #333;
+}
+
+/**
+ * État hover de l'item de recherche
+ * Feedback visuel au survol de la souris
+ */
+.search-item:hover {
+    /* Change le fond au survol pour indiquer l'élément survolé */
+    background-color: var(--hover-color);
+}
+
+/**
+ * Image miniature dans les résultats de recherche
+ * Affiche le poster du film/série en petit format
+ */
+.search-item img {
+    /* Largeur fixe de 50px pour uniformité */
+    width: 50px;
+    
+    /* Hauteur fixe de 75px (ratio poster standard ~2:3) */
+    height: 75px;
+    
+    /* object-fit: cover redimensionne l'image pour remplir la zone */
+    /* Coupe l'image si nécessaire pour respecter width/height */
+    object-fit: cover;
+    
+    /* Petits coins arrondis pour adoucir */
+    border-radius: 4px;
+}
+
+/**
+ * Titre du résultat de recherche (nom du film/série)
+ */
+.search-item-info h4 {
+    /* Taille de police normale */
+    font-size: 1rem;
+    
+    /* Marge en bas pour espacer du paragraphe suivant */
+    margin-bottom: 0.3rem;
+}
+
+/**
+ * Informations secondaires (type et année)
+ */
+.search-item-info p {
+    /* Taille de police réduite pour info secondaire */
+    font-size: 0.85rem;
+    
+    /* Couleur grise atténuée pour moins d'importance visuelle */
+    color: var(--text-muted);
+}
+
+/* ===== HERO SECTION / BANNIÈRE D'ACCUEIL ===== */
+/**
+ * Section hero : grande bannière en haut de la page d'accueil
+ * Affiche une vidéo en arrière-plan avec des séquences de films et séries
+ */
+.hero {
+    /* Position relative pour positionner la vidéo et l'overlay */
+    position: relative;
+    
+    /* Hauteur minimale de 500px pour bannière imposante */
+    min-height: 500px;
+    
+    /* Flexbox pour centrer le contenu verticalement et horizontalement */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    /* Centre tout le texte horizontalement */
+    text-align: center;
+    
+    /* Overflow hidden pour éviter que la vidéo dépasse */
+    overflow: hidden;
+    
+    /* Fond de secours noir si la vidéo ne charge pas */
+    background-color: #000000;
+}
+
+/**
+ * Élément vidéo en arrière-plan du hero
+ * Lecture automatique en boucle
+ */
+.hero-video {
+    /* Position absolue pour couvrir tout le hero */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    
+    /* Dimensions minimales pour couvrir tout l'espace */
+    min-width: 100%;
+    min-height: 100%;
+    
+    /* Largeur et hauteur automatiques pour garder le ratio */
+    width: auto;
+    height: auto;
+    
+    /* z-index: 0 pour être derrière le contenu */
+    z-index: 0;
+    
+    /* Filtre pour légèrement assombrir la vidéo si besoin */
+    /* filter: brightness(0.7); */
+    
+    /* Object-fit cover pour éviter les bandes noires */
+    object-fit: cover;
+}
+
+/**
+ * Pseudo-élément pour créer un overlay sombre sur la vidéo
+ * Améliore la lisibilité du texte blanc sur la vidéo
+ */
+.hero::before {
+    /* Obligatoire pour afficher le pseudo-élément */
+    content: '';
+    
+    /* Positionnement absolu pour couvrir tout le parent */
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    
+    /* Overlay noir semi-transparent */
+    /* rgba(0, 0, 0, 0.6) = noir avec 60% d'opacité */
+    /* Ajuster l'opacité selon vos besoins (0.4 à 0.7) */
+    background-color: rgba(0, 0, 0, 0.6);
+    
+    /* z-index: 1 pour être au-dessus de la vidéo mais sous le texte */
+    z-index: 1;
+}
+
+/**
+ * Container dans le hero
+ * Position relative et z-index pour être au-dessus de l'overlay
+ */
+.hero .container {
+    /* Position relative pour contexte z-index */
+    position: relative;
+    
+    /* z-index: 2 pour être au-dessus de l'overlay */
+    z-index: 2;
+}
+
+/**
+ * Titre principal du hero (h2)
+ * Texte blanc avec ombre pour ressortir sur l'animation
+ */
+.hero h2 {
+    /* Très grande taille de police pour impact visuel */
+    font-size: 3rem;
+    
+    /* Marge en bas pour espacer du paragraphe */
+    margin-bottom: 1rem;
+    
+    /* Blanc pur pour contraster avec l'overlay sombre */
+    color: #ffffff;
+    
+    /* Ombre portée du texte pour améliorer la lisibilité */
+    /* 2px horizontal, 2px vertical, 10px flou, noir semi-transparent */
+    text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.8);
+    
+    /* Texte en gras pour plus d'impact */
+    font-weight: bold;
+}
+
+/**
+ * Sous-titre / description du hero
+ */
+.hero p {
+    /* Taille de police plus grande que le texte normal */
+    font-size: 1.3rem;
+    
+    /* Blanc pur au lieu de text-muted pour meilleure visibilité */
+    color: #ffffff;
+    
+    /* Ombre portée pour lisibilité */
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+}
+
+/* ===== RESPONSIVE HERO ===== */
+/**
+ * Media query pour les petits écrans (mobile)
+ * Réduit la taille du hero, des textes et ajuste la vidéo
+ */
+@media (max-width: 768px) {
+    .hero {
+        /* Réduit la hauteur minimale sur mobile */
+        min-height: 350px;
+    }
+    
+    .hero h2 {
+        /* Réduit la taille du titre sur mobile */
+        font-size: 2rem;
+    }
+    
+    .hero p {
+        /* Réduit la taille du paragraphe sur mobile */
+        font-size: 1rem;
+    }
+    
+    /* Assure que la vidéo couvre bien sur mobile */
+    .hero-video {
+        /* Sur mobile, prioriser la largeur pour éviter les bandes */
+        width: 100%;
+        height: auto;
+    }
+}
+
+/* ===== SECTIONS GÉNÉRALES ===== */
+/**
+ * Section générique : conteneur pour chaque section de contenu
+ * Utilisée pour Films Populaires, Séries Populaires, etc.
+ */
+.section {
+    /* Padding vertical de 3rem pour espacer les sections entre elles */
+    padding: 3rem 0;
+}
+
+/**
+ * Titres des sections et des pages
+ * Virgule = applique le même style aux deux classes
+ */
+.section-title,
+.page-title {
+    /* Grande taille de police pour les titres de sections */
+    font-size: 2rem;
+    
+    /* Marge en bas pour espacer du contenu qui suit */
+    margin-bottom: 2rem;
+    
+    /* Couleur blanche pour contraste */
+    color: var(--text-color);
+}
+
+/* ===== MEDIA GRID / GRILLE DE FILMS ET SÉRIES ===== */
+/**
+ * Grille responsive pour afficher les cartes de médias
+ * Utilise CSS Grid pour une disposition flexible et adaptative
+ */
+.media-grid {
+    /* display: grid active le système de disposition CSS Grid */
+    display: grid;
+    
+    /* Définition des colonnes de la grille */
+    /* repeat() répète un motif */
+    /* auto-fill crée autant de colonnes que possible selon l'espace disponible */
+    /* minmax(200px, 1fr) : chaque colonne fait minimum 200px, maximum 1 fraction de l'espace */
+    /* Résultat : grille responsive qui s'adapte automatiquement à la largeur */
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    
+    /* Espace de 2rem entre les cartes (lignes et colonnes) */
+    gap: 2rem;
+    
+    /* Marge en bas de la grille */
+    margin-bottom: 2rem;
+}
+
+/**
+ * Carte individuelle de média (film ou série)
+ * Élément cliquable qui affiche poster, titre, note
+ */
+.media-card {
+    /* Fond gris foncé pour la carte */
+    background-color: var(--card-background);
+    
+    /* Coins arrondis pour adoucir */
+    border-radius: var(--border-radius);
+    
+    /* overflow: hidden empêche le contenu de dépasser des coins arrondis */
+    /* Important pour que l'image respecte le border-radius */
+    overflow: hidden;
+    
+    /* Transition douce pour l'effet hover */
+    transition: var(--transition);
+    
+    /* Curseur en forme de main pour indiquer que c'est cliquable */
+    cursor: pointer;
+    
+    /* position: relative pour positionner le bouton favori en absolu */
+    position: relative;
+}
+
+/**
+ * État hover de la carte média
+ * Effet visuel au survol pour améliorer l'UX
+ */
+.media-card:hover {
+    /* transform: translateY déplace verticalement l'élément */
+    /* Valeur négative = vers le haut */
+    /* Crée un effet de "soulèvement" de la carte au survol */
+    transform: translateY(-5px);
+    
+    /* Ombre portée plus prononcée au survol */
+    /* 0 = horizontal, 10px = vertical vers le bas, 30px = flou */
+    /* rgba(229, 9, 20, 0.3) = rouge avec 30% d'opacité */
+    box-shadow: 0 10px 30px rgba(229, 9, 20, 0.3);
+}
+
+/**
+ * Image du poster dans la carte média
+ */
+.media-card img {
+    /* Prend 100% de la largeur de la carte */
+    width: 100%;
+    
+    /* Hauteur fixe de 300px pour uniformité */
+    height: 300px;
+    
+    /* object-fit: cover redimensionne l'image pour remplir la zone */
+    /* Garde les proportions et coupe si nécessaire */
+    object-fit: cover;
+}
+
+/**
+ * Conteneur du contenu textuel de la carte (titre, note, date)
+ */
+.media-card-content {
+    /* Padding de 1rem sur tous les côtés pour espacer du bord */
+    padding: 1rem;
+}
+
+/**
+ * Titre du film/série (h3)
+ */
+.media-card-content h3 {
+    /* Taille de police légèrement plus grande */
+    font-size: 1.1rem;
+    
+    /* Marge en bas pour espacer de la note */
+    margin-bottom: 0.5rem;
+}
+
+/**
+ * Note/rating du film/série
+ * Sélecteur descendant: .rating à l'intérieur de .media-card-content
+ */
+.media-card-content .rating {
+    /* Couleur jaune or pour la note (étoiles) */
+    color: #ffd700;
+    
+    /* Texte en gras pour mettre en valeur */
+    font-weight: bold;
+    
+    /* Marge en bas pour espacer de la date */
+    margin-bottom: 0.5rem;
+}
+
+/**
+ * Date de sortie du film/série
+ */
+.media-card-content .date {
+    /* Couleur grise atténuée (info secondaire) */
+    color: var(--text-muted);
+    
+    /* Taille de police légèrement réduite */
+    font-size: 0.9rem;
+}
+
+/**
+ * Bouton favori (coeur) positionné sur la carte
+ * Permet d'ajouter/retirer des favoris
+ */
+.favorite-btn {
+    /* position: absolute sort du flux et se positionne par rapport au parent relative */
+    position: absolute;
+    
+    /* Positioné à 10px du haut de la carte */
+    top: 10px;
+    
+    /* Positioné à 10px de la droite de la carte */
+    right: 10px;
+    
+    /* Fond noir semi-transparent (70% d'opacité) */
+    /* rgba(0, 0, 0, 0.7) = noir avec alpha 0.7 */
+    background-color: rgba(0, 0, 0, 0.7);
+    
+    /* Supprime la bordure par défaut du bouton */
+    border: none;
+    
+    /* Couleur du texte/emoji blanc */
+    color: white;
+    
+    /* Grande taille de police pour l'emoji coeur */
+    font-size: 1.5rem;
+    
+    /* Largeur fixe de 40px */
+    width: 40px;
+    
+    /* Hauteur fixe de 40px (carré) */
+    height: 40px;
+    
+    /* border-radius: 50% transforme le carré en cercle parfait */
+    border-radius: 50%;
+    
+    /* Curseur en forme de main */
+    cursor: pointer;
+    
+    /* Transition douce pour les effets hover */
+    transition: var(--transition);
+    
+    /* Flexbox pour centrer l'emoji à l'intérieur */
+    display: flex;
+    
+    /* Centre verticalement */
+    align-items: center;
+    
+    /* Centre horizontalement */
+    justify-content: center;
+}
+
+/**
+ * État hover du bouton favori
+ * :not(:disabled) = seulement si le bouton n'est pas désactivé
+ */
+.favorite-btn:hover {
+    /* Fond rouge au survol */
+    background-color: var(--primary-color);
+    
+    /* transform: scale agrandit l'élément */
+    /* 1.1 = 110% de la taille originale (10% plus grand) */
+    transform: scale(1.1);
+}
+
+/**
+ * État actif du bouton favori (quand le film est déjà en favori)
+ * Classe .active ajoutée dynamiquement en JavaScript
+ */
+.favorite-btn.active {
+    /* Coeur rouge quand en favori */
+    color: var(--primary-color);
+}
+
+/* ===== PAGINATION ===== */
+/**
+ * Conteneur de la pagination
+ * Contient les boutons Précédent/Suivant et l'info de page
+ */
+.pagination {
+    /* Flexbox pour aligner horizontalement les éléments */
+    display: flex;
+    
+    /* Centre horizontalement le contenu */
+    justify-content: center;
+    
+    /* Centre verticalement les éléments */
+    align-items: center;
+    
+    /* Espace de 2rem entre les éléments (boutons et texte) */
+    gap: 2rem;
+    
+    /* Padding vertical pour espacer du contenu au-dessus et en-dessous */
+    padding: 2rem 0;
+}
+
+/**
+ * Boutons de pagination (Précédent et Suivant)
+ */
+.btn-pagination {
+    /* Padding : 0.8rem vertical (12.8px), 1.5rem horizontal (24px) */
+    padding: 0.8rem 1.5rem;
+    
+    /* Fond rouge pour les boutons */
+    background-color: var(--primary-color);
+    
+    /* Texte blanc */
+    color: var(--text-color);
+    
+    /* Supprime la bordure par défaut */
+    border: none;
+    
+    /* Coins arrondis */
+    border-radius: var(--border-radius);
+    
+    /* Curseur en forme de main */
+    cursor: pointer;
+    
+    /* Taille de police normale */
+    font-size: 1rem;
+    
+    /* Transition douce pour les effets */
+    transition: var(--transition);
+}
+
+/**
+ * État hover des boutons de pagination
+ * :not(:disabled) = ne s'applique que si le bouton n'est pas désactivé
+ * Sinon les boutons désactivés auraient aussi l'effet hover
+ */
+.btn-pagination:hover:not(:disabled) {
+    /* Rouge plus foncé au survol */
+    background-color: #c40812;
+    
+    /* Léger agrandissement au survol (5%) */
+    transform: scale(1.05);
+}
+
+/**
+ * État désactivé des boutons
+ * :disabled = bouton désactivé (page 1 pour Précédent, dernière page pour Suivant)
+ */
+.btn-pagination:disabled {
+    /* opacity: 0.5 = semi-transparent (50%) */
+    /* Indique visuellement que le bouton n'est pas cliquable */
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/**
+ * Informations de page (ex: "Page 1 sur 50")
+ * Élément d'affichage entre les boutons de pagination
+ */
+#pageInfo {
+    /* Texte légèrement plus grand pour la visibilité */
+    font-size: 1.2rem;
+    
+    /* Texte en gras pour mettre en évidence */
+    font-weight: bold;
+}
+
+/**
+ * ============================================
+ * PAGE DE DÉTAILS (detail.html)
+ * Styles pour la page individuelle d'un film/série
+ * ============================================
+ */
+
+/**
+ * Bannière hero de la page de détails
+ * Affiche l'image backdrop du film/série en arrière-plan
+ */
+.detail-hero {
+    /* position: relative = contexte pour le positionnement absolu du ::before */
+    position: relative;
+    
+    /* Hauteur fixe de 500px pour la bannière */
+    height: 500px;
+    
+    /* background-size: cover = image couvre toute la zone */
+    /* L'image garde ses proportions mais peut être recadrée */
+    background-size: cover;
+    
+    /* Centrage de l'image dans la zone */
+    background-position: center;
+    
+    /* Flexbox pour positionner le contenu */
+    display: flex;
+    
+    /* Alignement en bas de la bannière */
+    /* Le contenu (titre, infos) sera en bas de l'image */
+    align-items: flex-end;
+}
+
+/**
+ * Pseudo-élément pour le gradient de la bannière
+ * ::before = crée un élément avant le contenu de .detail-hero
+ * Permet d'avoir un overlay sans ajouter d'élément HTML
+ */
+.detail-hero::before {
+    /* content: '' = obligatoire pour que le pseudo-élément existe */
+    content: '';
+    
+    /* Positionnement absolu par rapport à .detail-hero (parent en relative) */
+    position: absolute;
+    
+    /* Couvre toute la surface de .detail-hero */
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    
+    /* Gradient du bas vers le haut */
+    /* En bas: couleur de fond opaque (var(--background)) */
+    /* En haut: transparent pour voir l'image */
+    /* Crée une transition douce entre l'image et le contenu */
+    background: linear-gradient(to top, var(--background) 0%, transparent 100%);
+}
+
+/**
+ * Contenu de la bannière (titre, infos)
+ * Positionné au-dessus du gradient grâce au z-index
+ */
+.detail-content {
+    /* position: relative = nécessaire pour que z-index fonctionne */
+    position: relative;
+    
+    /* z-index: 1 = au-dessus du ::before (qui a z-index: 0 par défaut) */
+    /* Permet de voir le texte au-dessus du gradient */
+    z-index: 1;
+    
+    /* Espacement vertical de 2rem (32px) */
+    padding: 2rem 0;
+}
+
+/**
+ * Section principale de la page de détails
+ * Disposition en grille: poster à gauche, informations à droite
+ */
+.detail-main {
+    /* CSS Grid pour layout en 2 colonnes */
+    display: grid;
+    
+    /* Colonne 1: 300px fixe pour le poster */
+    /* Colonne 2: 1fr = prend tout l'espace restant pour les infos */
+    grid-template-columns: 300px 1fr;
+    
+    /* Espacement de 3rem (48px) entre les colonnes */
+    gap: 3rem;
+    
+    /* Espacement vertical */
+    padding: 2rem 0;
+}
+
+/**
+ * Image poster du film/série dans la page de détails
+ */
+.detail-poster img {
+    /* Largeur 100% de son conteneur (300px de la grille) */
+    width: 100%;
+    
+    /* Coins arrondis */
+    border-radius: var(--border-radius);
+    
+    /* Ombre portée pour effet de profondeur */
+    /* 0 = pas de décalage horizontal */
+    /* 10px = décalage vertical */
+    /* 30px = flou (blur) */
+    /* rgba(0, 0, 0, 0.5) = noir avec 50% d'opacité */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+/**
+ * Titre principal du film/série
+ * Titre h1 dans la section d'informations
+ */
+.detail-info h1 {
+    /* Très grande taille de police pour le titre (48px) */
+    font-size: 3rem;
+    
+    /* Marge inférieure pour espacer du contenu suivant */
+    margin-bottom: 1rem;
+}
+
+/**
+ * Métadonnées du film/série
+ * Affiche: date de sortie, durée, note, etc.
+ */
+.detail-meta {
+    /* Flexbox pour aligner les métadonnées horizontalement */
+    display: flex;
+    
+    /* Espacement de 2rem (32px) entre chaque information */
+    gap: 2rem;
+    
+    /* Marge inférieure pour espacer de la description */
+    margin-bottom: 2rem;
+    
+    /* Couleur grise pour les métadonnées (moins importantes visuellement) */
+    color: var(--text-muted);
+}
+
+/**
+ * Chaque élément de métadonnée (date, durée, etc.)
+ */
+.detail-meta span {
+    /* Flexbox pour aligner icône et texte */
+    display: flex;
+    
+    /* Centrage vertical de l'icône et du texte */
+    align-items: center;
+    
+    /* Petit espacement entre icône et texte */
+    gap: 0.5rem;
+}
+
+/**
+ * Note du film/série
+ * Affichage avec couleur dorée pour attirer l'attention
+ */
+.detail-rating {
+    /* Couleur or (#ffd700 = gold) pour la note */
+    /* Rappelle le système d'étoiles jaunes/dorées */
+    color: #ffd700;
+    
+    /* Taille légèrement plus grande pour la visibilité */
+    font-size: 1.5rem;
+    
+    /* Texte en gras pour mettre en valeur la note */
+    font-weight: bold;
+}
+
+/**
+ * Synopsis/description du film/série
+ * Texte long nécessitant une bonne lisibilité
+ */
+.detail-overview {
+    /* Marge inférieure pour espacer de la section suivante */
+    margin-bottom: 2rem;
+    
+    /* line-height: 1.8 = hauteur de ligne généreuse */
+    /* Améliore la lisibilité des paragraphes longs */
+    /* 1.8 = 180% de la taille de police */
+    line-height: 1.8;
+    
+    /* Taille de police légèrement plus grande pour confort de lecture */
+    font-size: 1.1rem;
+}
+
+/**
+ * Grille des acteurs/équipe du film/série
+ * Affichage responsive des cartes de crédits
+ */
+.detail-credits {
+    /* CSS Grid pour disposition responsive des acteurs */
+    display: grid;
+    
+    /* repeat(auto-fill, ...) = crée autant de colonnes que possible */
+    /* minmax(150px, 1fr) = minimum 150px, maximum une fraction égale */
+    /* S'adapte automatiquement à la largeur disponible */
+    /* Plus étroit que les cartes de films (150px vs 200px) */
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    
+    /* Espacement entre les cartes d'acteurs */
+    gap: 1rem;
+    
+    /* Marge supérieure pour séparer de la section précédente */
+    margin-top: 2rem;
+}
+
+/**
+ * Carte individuelle d'un acteur/membre de l'équipe
+ */
+.credit-item {
+    /* Fond gris foncé pour la carte */
+    background-color: var(--card-background);
+    
+    /* Espacement intérieur */
+    padding: 1rem;
+    
+    /* Coins arrondis */
+    border-radius: var(--border-radius);
+    
+    /* Centrage du contenu (photo, nom, rôle) */
+    text-align: center;
+}
+
+/**
+ * Photo de profil de l'acteur/membre
+ */
+.credit-item img {
+    /* Dimensions fixes carrées */
+    width: 100px;
+    height: 100px;
+    
+    /* border-radius: 50% = cercle parfait */
+    /* Transform un carré en cercle */
+    border-radius: 50%;
+    
+    /* object-fit: cover = image remplit la zone sans déformation */
+    /* Recadrage automatique si l'image n'est pas carrée */
+    object-fit: cover;
+    
+    /* Marge inférieure pour espacer du nom */
+    margin-bottom: 0.5rem;
+}
+
+/**
+ * Nom de l'acteur/membre (h4)
+ */
+.credit-item h4 {
+    /* Taille légèrement réduite */
+    font-size: 0.95rem;
+    
+    /* Petite marge pour espacer du rôle */
+    margin-bottom: 0.3rem;
+}
+
+/**
+ * Rôle ou fonction (paragraphe)
+ */
+.credit-item p {
+    /* Taille plus petite que le nom */
+    font-size: 0.85rem;
+    
+    /* Couleur grise pour information secondaire */
+    color: var(--text-muted);
+}
+
+/**
+ * ============================================
+ * SECTION COMMENTAIRES
+ * Permet aux utilisateurs de commenter un film/série
+ * ============================================
+ */
+
+/**
+ * Section globale des commentaires
+ * Fond légèrement différent pour séparer visuellement
+ */
+.comments-section {
+    /* Fond gris légèrement différent du fond principal */
+    background-color: var(--secondary-color);
+    
+    /* Espacement vertical généreux (3rem = 48px) */
+    padding: 3rem 0;
+}
+
+/**
+ * Formulaire d'ajout de commentaire
+ * Permet à l'utilisateur d'écrire un nouveau commentaire
+ */
+.add-comment {
+    /* Fond de carte pour le distinguer */
+    background-color: var(--card-background);
+    
+    /* Espacement intérieur généreux */
+    padding: 2rem;
+    
+    /* Coins arrondis */
+    border-radius: var(--border-radius);
+    
+    /* Marge inférieure pour séparer de la liste des commentaires */
+    margin-bottom: 2rem;
+}
+
+/**
+ * Titre du formulaire (ex: "Ajouter un commentaire")
+ */
+.add-comment h3 {
+    /* Marge inférieure pour espacer du textarea */
+    margin-bottom: 1rem;
+}
+
+/**
+ * Zone de texte pour écrire un commentaire
+ * Textarea avec style personnalisé
+ */
+#commentText {
+    /* Largeur 100% pour remplir le conteneur */
+    width: 100%;
+    
+    /* Hauteur minimale de 100px */
+    /* L'utilisateur peut agrandir mais pas réduire en dessous */
+    min-height: 100px;
+    
+    /* Espacement intérieur pour le confort de saisie */
+    padding: 1rem;
+    
+    /* Fond sombre pour s'intégrer au design */
+    background-color: var(--background);
+    
+    /* Bordure grise discrète */
+    border: 1px solid #333;
+    
+    /* Coins arrondis */
+    border-radius: var(--border-radius);
+    
+    /* Couleur du texte saisi */
+    color: var(--text-color);
+    
+    /* font-family: inherit = utilise la police du parent */
+    /* Évite que le textarea ait une police différente */
+    font-family: inherit;
+    
+    /* Taille de police normale */
+    font-size: 1rem;
+    
+    /* resize: vertical = permet uniquement le redimensionnement vertical */
+    /* L'utilisateur peut agrandir en hauteur mais pas en largeur */
+    resize: vertical;
+}
+
+/**
+ * État focus du textarea (quand l'utilisateur clique dedans)
+ * :focus = pseudo-classe activée quand l'élément a le focus
+ */
+#commentText:focus {
+    /* Supprime le outline par défaut du navigateur */
+    outline: none;
+    
+    /* Bordure rouge pour indiquer le focus */
+    /* Feedback visuel que le textarea est actif */
+    border-color: var(--primary-color);
+}
+
+/**
+ * Bouton générique (ex: "Publier le commentaire")
+ * Classe réutilisable pour tous les boutons principaux
+ */
+.btn {
+    /* Espacement intérieur: 0.8rem vertical, 2rem horizontal */
+    /* Bouton plus large que haut pour un look moderne */
+    padding: 0.8rem 2rem;
+    
+    /* Couleur de fond rouge principale */
+    background-color: var(--primary-color);
+    
+    /* Texte blanc */
+    color: var(--text-color);
+    
+    /* Supprime la bordure par défaut du bouton */
+    border: none;
+    
+    /* Coins arrondis */
+    border-radius: var(--border-radius);
+    
+    /* Curseur en forme de main au survol */
+    cursor: pointer;
+    
+    /* Taille de police normale */
+    font-size: 1rem;
+    
+    /* Marge supérieure pour espacer du textarea */
+    margin-top: 1rem;
+    
+    /* Transition douce pour les effets */
+    transition: var(--transition);
+}
+
+/**
+ * État hover du bouton
+ * Rouge plus foncé au survol
+ */
+.btn:hover {
+    /* Rouge plus foncé pour feedback visuel */
+    background-color: #c40812;
+}
+
+/**
+ * Liste de tous les commentaires
+ * Disposition verticale avec espacement entre chaque commentaire
+ */
+.comments-list {
+    /* Flexbox en colonne pour empilement vertical */
+    display: flex;
+    
+    /* Direction verticale (par défaut c'est horizontal) */
+    flex-direction: column;
+    
+    /* Espacement de 1.5rem entre chaque commentaire */
+    gap: 1.5rem;
+}
+
+/**
+ * Carte d'un commentaire individuel
+ * Affiche: auteur, date, contenu, actions (répondre, supprimer)
+ */
+.comment {
+    /* Fond de carte */
+    background-color: var(--card-background);
+    
+    /* Espacement intérieur */
+    padding: 1.5rem;
+    
+    /* Coins arrondis */
+    border-radius: var(--border-radius);
+    
+    /* Barre verticale rouge à gauche */
+    /* border-left: 3px = barre de 3px de large */
+    /* Détail visuel pour distinguer les commentaires */
+    border-left: 3px solid var(--primary-color);
+}
+
+/**
+ * En-tête du commentaire
+ * Contient: nom de l'auteur (gauche) et date (droite)
+ */
+.comment-header {
+    /* Flexbox pour disposition horizontale */
+    display: flex;
+    
+    /* Espace maximum entre auteur et date */
+    /* Auteur à gauche, date à droite */
+    justify-content: space-between;
+    
+    /* Centrage vertical */
+    align-items: center;
+    
+    /* Marge inférieure pour espacer du contenu du commentaire */
+    margin-bottom: 1rem;
+}
+
+/**
+ * Nom de l'auteur du commentaire
+ */
+.comment-author {
+    /* Texte en gras pour mettre en avant */
+    font-weight: bold;
+    
+    /* Couleur rouge pour attirer l'attention */
+    color: var(--primary-color);
+}
+
+/**
+ * Date du commentaire
+ * Information secondaire, moins mise en avant
+ */
+.comment-date {
+    /* Couleur grise pour information secondaire */
+    color: var(--text-muted);
+    
+    /* Taille légèrement réduite */
+    font-size: 0.9rem;
+}
+
+/**
+ * Contenu textuel du commentaire
+ * Le message écrit par l'utilisateur
+ */
+.comment-content {
+    /* Hauteur de ligne pour bonne lisibilité */
+    /* 1.6 = 160% de la taille de police */
+    line-height: 1.6;
+    
+    /* Marge inférieure pour espacer des actions */
+    margin-bottom: 1rem;
+}
+
+/**
+ * Conteneur des actions disponibles sur un commentaire
+ * Ex: boutons "Répondre", "Supprimer"
+ */
+.comment-actions {
+    /* Flexbox pour disposition horizontale */
+    display: flex;
+    
+    /* Espacement entre les boutons d'action */
+    gap: 1rem;
+}
+
+/**
+ * Boutons d'action sur un commentaire
+ * Style minimaliste (pas de fond, pas de bordure)
+ */
+.comment-btn {
+    /* background: none = pas de fond */
+    /* Bouton transparent, seul le texte est visible */
+    background: none;
+    
+    /* Pas de bordure */
+    border: none;
+    
+    /* Couleur grise par défaut (discret) */
+    color: var(--text-muted);
+    
+    /* Curseur en forme de main */
+    cursor: pointer;
+    
+    /* Taille légèrement réduite */
+    font-size: 0.9rem;
+    
+    /* Transition douce pour le changement de couleur */
+    transition: var(--transition);
+}
+
+/**
+ * État hover du bouton d'action
+ * Couleur rouge au survol pour indiquer l'interactivité
+ */
+.comment-btn:hover {
+    /* Rouge au survol */
+    color: var(--primary-color);
+}
+
+/**
+ * Conteneur des réponses à un commentaire
+ * Indenté et marqué visuellement pour montrer la hiérarchie
+ */
+.comment-replies {
+    /* Décalage à gauche pour indenter les réponses */
+    /* Crée une hiérarchie visuelle: commentaire > réponses */
+    margin-left: 2rem;
+    
+    /* Marge supérieure pour espacer du commentaire parent */
+    margin-top: 1rem;
+    
+    /* Espacement intérieur à gauche */
+    padding-left: 1rem;
+    
+    /* Barre verticale à gauche pour indiquer les réponses */
+    /* Plus fine que celle des commentaires (2px vs 3px) */
+    /* Couleur grise pour moins attirer l'attention */
+    border-left: 2px solid #333;
+}
+
+/**
+ * Formulaire de réponse à un commentaire
+ * Caché par défaut, affiché quand on clique sur "Répondre"
+ */
+.reply-form {
+    /* Marge supérieure pour espacer du commentaire */
+    margin-top: 1rem;
+    
+    /* display: none = caché par défaut */
+    /* JavaScript ajoutera la classe .active pour l'afficher */
+    display: none;
+}
+
+/**
+ * Formulaire de réponse actif (visible)
+ * La classe .active est ajoutée par JavaScript
+ */
+.reply-form.active {
+    /* display: block = affiche le formulaire */
+    display: block;
+}
+
+/**
+ * Zone de texte du formulaire de réponse
+ * Plus petite que le textarea principal (80px vs 100px)
+ */
+.reply-form textarea {
+    /* Largeur 100% */
+    width: 100%;
+    
+    /* Hauteur minimale plus petite (80px vs 100px) */
+    /* Les réponses sont généralement plus courtes */
+    min-height: 80px;
+    
+    /* Espacement intérieur */
+    padding: 0.8rem;
+    
+    /* Fond sombre */
+    background-color: var(--background);
+    
+    /* Bordure grise */
+    border: 1px solid #333;
+    
+    /* Coins arrondis */
+    border-radius: var(--border-radius);
+    
+    /* Couleur du texte */
+    color: var(--text-color);
+    
+    /* Hérite de la police du parent */
+    font-family: inherit;
+    
+    /* Taille légèrement réduite (0.95rem vs 1rem) */
+    font-size: 0.95rem;
+    
+    /* Redimensionnement vertical uniquement */
+    resize: vertical;
+}
+
+/**
+ * ============================================
+ * ÉTATS DE CHARGEMENT ET ERREURS
+ * Messages affichés pendant le chargement ou quand il n'y a pas de résultats
+ * ============================================
+ */
+
+/**
+ * Message de chargement
+ * Affiché pendant que les données sont récupérées depuis l'API
+ */
+.loading {
+    /* Centrage du texte */
+    text-align: center;
+    
+    /* Grand espacement vertical (3rem = 48px) */
+    padding: 3rem;
+    
+    /* Texte légèrement plus grand */
+    font-size: 1.2rem;
+    
+    /* Couleur grise pour message informatif */
+    color: var(--text-muted);
+}
+
+/**
+ * Message "Aucun résultat"
+ * Affiché quand la recherche ou le filtre ne retourne rien
+ */
+.no-results {
+    /* Centrage du texte */
+    text-align: center;
+    
+    /* Grand espacement vertical */
+    padding: 3rem;
+    
+    /* Texte légèrement plus grand */
+    font-size: 1.2rem;
+    
+    /* Couleur grise */
+    color: var(--text-muted);
+}
+
+/**
+ * ============================================
+ * FOOTER (PIED DE PAGE)
+ * Affiché en bas de chaque page
+ * ============================================
+ */
+
+/**
+ * Élément footer principal
+ * Contient les informations de copyright et crédits
+ */
+footer {
+    /* Fond légèrement différent pour séparer visuellement */
+    background-color: var(--secondary-color);
+    
+    /* Espacement vertical */
+    padding: 2rem 0;
+    
+    /* Centrage du contenu */
+    text-align: center;
+    
+    /* Grande marge supérieure pour séparer du contenu */
+    margin-top: 3rem;
+    
+    /* Ligne de séparation en haut */
+    border-top: 1px solid #333;
+}
+
+/**
+ * Paragraphes dans le footer
+ * Texte de copyright, mentions, etc.
+ */
+footer p {
+    /* Couleur grise pour texte secondaire */
+    color: var(--text-muted);
+}
+
+/**
+ * ============================================
+ * RESPONSIVE DESIGN
+ * Adaptation du design pour différentes tailles d'écran
+ * Mobile-first approach avec breakpoints progressifs
+ * ============================================
+ */
+
+/**
+ * TABLETTES ET PETITS ORDINATEURS PORTABLES
+ * max-width: 1024px = s'applique pour les écrans de 1024px et moins
+ * Ex: iPad Pro en paysage (1024px), iPad en paysage (1024px)
+ */
+@media (max-width: 1024px) {
+    /**
+     * Ajustement de la grille de détails
+     * Poster plus petit (250px vs 300px) pour gagner de l'espace
+     */
+    .detail-main {
+        /* Colonne 1: 250px au lieu de 300px */
+        grid-template-columns: 250px 1fr;
+        
+        /* Gap réduit (2rem vs 3rem) */
+        gap: 2rem;
+    }
+}
+
+/**
+ * TABLETTES EN PORTRAIT ET GRANDS MOBILES
+ * max-width: 768px = s'applique pour les écrans de 768px et moins
+ * Ex: iPad en portrait (768px), tablettes Android
+ * Point de rupture principal pour passer en mode mobile
+ */
+@media (max-width: 768px) {
+    /**
+     * Header en disposition verticale
+     * Logo et navigation empilés au lieu de côte à côte
+     */
+    .header-content {
+        /* Passage en colonne verticale */
+        flex-direction: column;
+        
+        /* Espacement entre logo et navigation */
+        gap: 1rem;
+    }
+
+    /**
+     * Réduction de l'espacement dans la navigation
+     */
+    nav ul {
+        /* Gap réduit entre les liens (1rem vs 2rem) */
+        gap: 1rem;
+    }
+
+    /**
+     * Barre de recherche en pleine largeur
+     */
+    .search-container {
+        /* 100% de la largeur disponible au lieu de max-width: 600px */
+        max-width: 100%;
+    }
+
+    /**
+     * Section hero responsive sur tablette
+     * Réduction de la hauteur et de la taille du texte
+     */
+    .hero {
+        /* Hauteur réduite pour tablette */
+        min-height: 300px;
+    }
+
+    /**
+     * Titre de la section hero plus petit
+     * Adaptation pour petits écrans
+     */
+    .hero h2 {
+        /* 2rem (32px) au lieu de 3rem (48px) */
+        font-size: 2rem;
+    }
+
+    /**
+     * Texte de description plus petit
+     */
+    .hero p {
+        /* Taille normale (1rem) au lieu de 1.3rem */
+        font-size: 1rem;
+    }
+
+    /**
+     * Grille de films/séries avec cartes plus petites
+     * Colonnes réduites pour s'adapter à l'écran
+     */
+    .media-grid {
+        /* Cartes de minimum 150px au lieu de 200px */
+        /* Permet d'afficher plus de cartes sur petit écran */
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        
+        /* Gap réduit (1rem vs 1.5rem) */
+        gap: 1rem;
+    }
+
+    /**
+     * Page de détails en disposition verticale
+     * Poster au-dessus, informations en dessous
+     */
+    .detail-main {
+        /* Une seule colonne au lieu de 2 */
+        /* Poster et infos empilés verticalement */
+        grid-template-columns: 1fr;
+        
+        /* Gap maintenu */
+        gap: 2rem;
+    }
+
+    /**
+     * Titre principal plus petit
+     */
+    .detail-info h1 {
+        /* 2rem (32px) au lieu de 3rem (48px) */
+        font-size: 2rem;
+    }
+
+    /**
+     * Métadonnées sur plusieurs lignes si nécessaire
+     */
+    .detail-meta {
+        /* flex-wrap: wrap = passage à la ligne si pas assez de place */
+        /* Évite le débordement horizontal */
+        flex-wrap: wrap;
+        
+        /* Gap réduit */
+        gap: 1rem;
+    }
+
+    /**
+     * Indentation réduite pour les réponses aux commentaires
+     * Moins d'espace disponible sur petit écran
+     */
+    .comment-replies {
+        /* 1rem au lieu de 2rem */
+        margin-left: 1rem;
+    }
+
+    /**
+     * Pagination plus compacte
+     */
+    .pagination {
+        /* Gap réduit (1rem vs 2rem) */
+        gap: 1rem;
+    }
+}
+
+/**
+ * PETITS MOBILES ET TÉLÉPHONES
+ * max-width: 480px = s'applique pour les écrans de 480px et moins
+ * Ex: iPhone SE (375px), petits smartphones Android
+ * Optimisations supplémentaires pour très petits écrans
+ */
+@media (max-width: 480px) {
+    /**
+     * Navigation très compacte
+     * Texte plus petit et espacement minimal
+     */
+    nav ul {
+        /* Espacement minimal entre les liens */
+        gap: 0.5rem;
+        
+        /* Texte légèrement plus petit */
+        font-size: 0.9rem;
+    }
+
+    /**
+     * Cartes de films encore plus petites
+     * Minimum 120px pour rester lisibles
+     */
+    .media-grid {
+        /* Cartes de minimum 120px */
+        /* Permet d'afficher 2-3 cartes sur très petit écran */
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    }
+
+    /**
+     * Images de cartes plus petites en hauteur
+     * Adaptation proportionnelle
+     */
+    .media-card img {
+        /* 180px au lieu de 300px */
+        height: 180px;
+    }
+
+    /**
+     * Titre hero encore plus petit
+     */
+    .hero h2 {
+        /* 1.5rem (24px) */
+        font-size: 1.5rem;
+    }
+
+    /**
+     * Tous les titres de sections plus petits
+     * .section-title = titres des sections ("Films populaires", etc.)
+     * .page-title = titres de pages ("Mes Favoris", etc.)
+     */
+    .section-title,
+    .page-title {
+        /* 1.5rem (24px) au lieu de 2rem (32px) */
+        font-size: 1.5rem;
+    }
+}

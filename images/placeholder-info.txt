@@ -1,0 +1,13 @@
+<!-- 
+FICHIER PLACEHOLDER
+===================
+Ce fichier est un placeholder SVG animé qui sera affiché en attendant que vous ajoutiez votre propre GIF.
+
+Pour remplacer ce placeholder :
+1. Trouvez ou créez votre GIF d'animation de films/séries
+2. Renommez-le en "hero-animation.gif"
+3. Placez-le dans ce même dossier (remplacez ce fichier ou supprimez-le)
+4. Rafraîchissez votre navigateur
+
+Ce SVG montre un exemple d'animation simple avec des bandes de film.
+-->

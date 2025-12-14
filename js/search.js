@@ -67,6 +67,23 @@ class Search {
             }, 300); // 300 millisecondes = 0.3 seconde
         });
 
+        // === ÉCOUTEUR TOUCHE ENTRÉE: RECHERCHE COMPLÈTE ===
+        // Redirige vers la page de résultats avec tous les films/séries
+        this.searchInput.addEventListener('keydown', (e) => {
+            // Si la touche Entrée est pressée (code 13 ou key 'Enter')
+            if (e.key === 'Enter' || e.keyCode === 13) {
+                e.preventDefault(); // Empêche le comportement par défaut du formulaire
+                
+                const query = e.target.value.trim();
+                
+                // Si au moins 2 caractères, rediriger vers la page de résultats
+                if (query.length >= 2) {
+                    // Redirection avec le mot-clé dans l'URL
+                    window.location.href = `search-results.html?q=${encodeURIComponent(query)}`;
+                }
+            }
+        });
+
         // === ÉCOUTEUR GLOBAL: FERMER LES RÉSULTATS SI CLIC EXTÉRIEUR ===
         // Améliore l'UX en cachant les résultats quand on clique ailleurs
         document.addEventListener('click', (e) => {
@@ -81,50 +98,85 @@ class Search {
 
     /**
      * Effectue une recherche asynchrone via l'API TMDB
+     * Combine recherche de médias et suggestions de mots-clés
      * @param {string} query - Terme de recherche saisi par l'utilisateur
      */
     async performSearch(query) {
         // Bloc try-catch pour gérer les erreurs réseau ou API
         try {
-            // Appel asynchrone à l'API de recherche multi (films + séries + personnes)
-            // await attend que la promesse soit résolue avant de continuer
-            const data = await api.searchMulti(query);
+            // Recherche parallèle : médias ET mots-clés
+            const [mediaData, keywordsData] = await Promise.all([
+                api.searchMulti(query),
+                api.searchKeywords(query)
+            ]);
             
-            // Affichage des résultats reçus
-            // data.results contient le tableau des résultats
-            this.displayResults(data.results);
+            // Affichage des résultats combinés
+            this.displayResults(mediaData.results, keywordsData.results, query);
         } catch (error) {
             // En cas d'erreur (réseau, API down, etc.), log dans la console
             console.error('Erreur lors de la recherche:', error);
-            // On pourrait aussi afficher un message d'erreur à l'utilisateur ici
+            // Affichage uniquement des résultats de médias en cas d'erreur keywords
+            try {
+                const data = await api.searchMulti(query);
+                this.displayResults(data.results, [], query);
+            } catch (e) {
+                console.error('Erreur complète:', e);
+            }
         }
     }
 
     /**
      * Affiche les résultats de recherche dans le dropdown d'autocomplétion
-     * @param {Array} results - Tableau des résultats retournés par l'API
+     * Affiche suggestions de mots-clés + top 5 médias
+     * @param {Array} results - Tableau des résultats médias retourns par l'API
+     * @param {Array} keywords - Tableau des suggestions de mots-clés
+     * @param {string} query - Terme de recherche pour surligner les correspondances
      */
-    displayResults(results) {
-        // Si aucun résultat ou tableau vide
-        if (!results || results.length === 0) {
-            // Afficher un message "Aucun résultat"
-            this.searchResults.innerHTML = '<div class="search-item">Aucun résultat</div>';
-            this.showResults(); // Afficher le dropdown
-            return; // Sortie de la fonction
-        }
-
-        // Filtrage des résultats pour ne garder que films et séries
-        // L'API peut aussi retourner des personnes (acteurs), on les exclut
-        const filtered = results.filter(item => 
-            // filter() garde les éléments qui retournent true
-            item.media_type === 'movie' || item.media_type === 'tv'
-        ).slice(0, 5); // slice(0, 5) garde seulement les 5 premiers résultats
-
+    displayResults(results, keywords = [], query = '') {
         // Vider le conteneur de résultats précédents
         this.searchResults.innerHTML = '';
 
+        // === SECTION 1: SUGGESTIONS DE MOTS-CLÉS ===
+        if (keywords && keywords.length > 0) {
+            // Filtrer et limiter à 3 suggestions de mots-clés
+            const topKeywords = keywords.slice(0, 3);
+            
+            topKeywords.forEach(keyword => {
+                const keywordItem = document.createElement('div');
+                keywordItem.className = 'search-item search-keyword';
+                keywordItem.innerHTML = `
+                    <span class="keyword-icon">🔍</span>
+                    <div class="search-item-info">
+                        <h4>${this.highlightMatch(keyword.name, query)}</h4>
+                    </div>
+                `;
+                
+                // Clic sur un mot-clé = recherche complète
+                keywordItem.addEventListener('click', () => {
+                    window.location.href = `search-results.html?q=${encodeURIComponent(keyword.name)}`;
+                });
+                
+                this.searchResults.appendChild(keywordItem);
+            });
+        }
+
+        // === SECTION 2: TOP 5 MÉDIAS ===
+        if (!results || results.length === 0) {
+            // Si aucun résultat média après les keywords
+            if (keywords.length === 0) {
+                this.searchResults.innerHTML = '<div class="search-item search-no-result">Aucun résultat</div>';
+            }
+            this.showResults();
+            return;
+        }
+
+        // Filtrage des résultats pour ne garder que films et séries
+        // Limité à 5 résultats maximum (pas de scrollbar)
+        const filtered = results.filter(item => 
+            item.media_type === 'movie' || item.media_type === 'tv'
+        ).slice(0, 5);
+
         // Parcours de chaque résultat filtré
-        // forEach exécute une fonction pour chaque élément du tableau
         filtered.forEach(item => {
             // Création de l'élément visuel pour ce résultat
             const searchItem = this.createSearchItem(item);
@@ -134,6 +186,19 @@ class Search {
 
         // Affichage du dropdown de résultats
         this.showResults();
+    }
+
+    /**
+     * Surligne les correspondances dans le texte
+     * @param {string} text - Texte à afficher
+     * @param {string} query - Terme recherché
+     * @returns {string} - HTML avec les correspondances surlignées
+     */
+    highlightMatch(text, query) {
+        if (!query) return text;
+        
+        const regex = new RegExp(`(${query})`, 'gi');
+        return text.replace(regex, '<strong>$1</strong>');
     }
 
     /**
@@ -157,13 +222,13 @@ class Search {
         const posterUrl = api.getImageUrl(item.poster_path);
 
         // Construction du HTML interne
+        // Mini affiche (50x75px)
+        // Titre du film/série
+        // Type et année: ternaire pour afficher l'année seulement si disponible
         div.innerHTML = `
-            // Mini affiche (50x75px)
             <img src="${posterUrl}" alt="${title}">
             <div class="search-item-info">
-                // Titre du film/série
                 <h4>${title}</h4>
-                // Type et année: ternaire pour afficher l'année seulement si disponible
                 <p>${type}${year ? ` (${year})` : ''}</p>
             </div>
         `;

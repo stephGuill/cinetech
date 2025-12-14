@@ -399,7 +399,274 @@ nav a.active {
     color: var(--text-muted);
 }
 
-/* ===== HERO SECTION / BANNIÈRE D'ACCUEIL ===== */
+/**
+ * Suggestions de mots-clés dans la recherche
+ * Affichées en haut des résultats pour l'autocomplétion
+ */
+.search-keyword {
+    /* Fond légèrement différent pour distinguer des résultats média */
+    background-color: rgba(229, 9, 20, 0.1);
+    
+    /* Bordure gauche rouge pour identifier visuellement */
+    border-left: 3px solid var(--primary-color);
+}
+
+.search-keyword:hover {
+    background-color: rgba(229, 9, 20, 0.2);
+}
+
+/**
+ * Icône de loupe pour les suggestions de mots-clés
+ */
+.keyword-icon {
+    font-size: 1.5rem;
+    margin-right: 1rem;
+    opacity: 0.7;
+}
+
+/**
+ * Style pour le texte surligné dans les suggestions
+ */
+.search-item-info h4 strong {
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+/**
+ * Message "Aucun résultat"
+ */
+.search-no-result {
+    text-align: center;
+    color: var(--text-muted);
+    font-style: italic;
+    cursor: default;
+}
+
+.search-no-result:hover {
+    background-color: transparent;
+}
+
+/* ===== ONGLETS (TABS) ===== */
+/**
+ * Conteneur des boutons d'onglets
+ */
+.tabs {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    border-bottom: 2px solid #333;
+    flex-wrap: wrap;
+}
+
+/**
+ * Bouton d'onglet individuel
+ */
+.tab-btn {
+    padding: 1rem 2rem;
+    background-color: transparent;
+    color: var(--text-color);
+    border: none;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    position: relative;
+    bottom: -2px;
+}
+
+.tab-btn:hover {
+    color: var(--primary-color);
+    background-color: rgba(229, 9, 20, 0.1);
+}
+
+.tab-btn.active {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+    font-weight: bold;
+}
+
+/**
+ * Contenu des onglets
+ */
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ===== PAGES LÉGALES ===== */
+/**
+ * Contenu des pages légales (Mentions légales, CGU, etc.)
+ */
+.legal-content {
+    max-width: 900px;
+    margin: 0 auto;
+    line-height: 1.8;
+}
+
+.legal-content h2 {
+    color: var(--primary-color);
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+    font-size: 1.8rem;
+}
+
+.legal-content h3 {
+    color: var(--text-color);
+    margin-top: 1.5rem;
+    margin-bottom: 0.8rem;
+    font-size: 1.3rem;
+}
+
+.legal-content h4 {
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.legal-content ul {
+    margin-left: 2rem;
+    margin-bottom: 1rem;
+}
+
+.legal-content li {
+    margin-bottom: 0.5rem;
+}
+
+.legal-content a {
+    color: var(--primary-color);
+    text-decoration: underline;
+}
+
+.legal-content a:hover {
+    color: #ff1f2f;
+}
+
+/* ===== FORMULAIRE DE CONTACT ===== */
+.contact-form {
+    max-width: 700px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 0.8rem;
+    background-color: var(--card-bg);
+    border: 1px solid #333;
+    border-radius: 4px;
+    color: var(--text-color);
+    font-family: inherit;
+    font-size: 1rem;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 150px;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #c4070f;
+}
+
+.form-message {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.form-message.success {
+    background-color: rgba(76, 175, 80, 0.2);
+    border: 1px solid #4caf50;
+    color: #4caf50;
+}
+
+.form-message.error {
+    background-color: rgba(244, 67, 54, 0.2);
+    border: 1px solid #f44336;
+    color: #f44336;
+}
+
+.contact-info {
+    margin: 3rem 0;
+    padding: 1.5rem;
+    background-color: rgba(229, 9, 20, 0.1);
+    border-left: 4px solid var(--primary-color);
+    border-radius: 4px;
+}
+
+.contact-info h3 {
+    margin-top: 0;
+    color: var(--primary-color);
+}
+
+.faq-preview {
+    margin-top: 3rem;
+}
+
+.faq-item {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background-color: rgba(255, 255, 255, 0.03);
+    border-radius: 8px;
+}
+
+.faq-item h4 {
+    color: var(--primary-color);
+    margin-top: 0;
+    margin-bottom: 0.8rem;
+}
+
+/* ===== FOOTER AMÉLIORÉ ===== */
 /**
  * Section hero : grande bannière en haut de la page d'accueil
  * Affiche une vidéo en arrière-plan avec des séquences de films et séries
@@ -1569,6 +1836,29 @@ footer {
 footer p {
     /* Couleur grise pour texte secondaire */
     color: var(--text-muted);
+    margin-bottom: 1rem;
+}
+
+/**
+ * Liens du footer (Contact, Mentions légales, CGU)
+ */
+.footer-links {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+}
+
+.footer-links a {
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.footer-links a:hover {
+    color: var(--primary-color);
 }
 
 /**

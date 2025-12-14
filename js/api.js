@@ -82,6 +82,63 @@ class TMDBService {
     }
 
     /**
+     * Récupère les films en tendance (trending)
+     * @param {string} timeWindow - 'day' ou 'week' (défaut: 'week')
+     * @returns {Promise<Object>} - Films tendance de la période
+     */
+    async getTrendingMovies(timeWindow = 'week') {
+        // Endpoint /trending/movie/{time_window}
+        return this.fetchData(`/trending/movie/${timeWindow}`);
+    }
+
+    /**
+     * Récupère les séries en tendance (trending)
+     * @param {string} timeWindow - 'day' ou 'week' (défaut: 'week')
+     * @returns {Promise<Object>} - Séries tendance de la période
+     */
+    async getTrendingSeries(timeWindow = 'week') {
+        // Endpoint /trending/tv/{time_window}
+        return this.fetchData(`/trending/tv/${timeWindow}`);
+    }
+
+    /**
+     * Récupère les nouveautés films (sorties récentes)
+     * @param {number} page - Numéro de la page
+     * @returns {Promise<Object>} - Nouveaux films sortis récemment
+     */
+    async getNewMovies(page = 1) {
+        // Utilise now_playing pour les films actuellement en salle
+        return this.fetchData('/movie/now_playing', { page });
+    }
+
+    /**
+     * Récupère les films à venir (upcoming)
+     * @param {number} page - Numéro de la page
+     * @returns {Promise<Object>} - Films à venir prochainement
+     */
+    async getUpcomingMovies(page = 1) {
+        return this.fetchData('/movie/upcoming', { page });
+    }
+
+    /**
+     * Récupère les séries diffusées aujourd'hui
+     * @param {number} page - Numéro de la page
+     * @returns {Promise<Object>} - Séries avec de nouveaux épisodes aujourd'hui
+     */
+    async getAiringTodaySeries(page = 1) {
+        return this.fetchData('/tv/airing_today', { page });
+    }
+
+    /**
+     * Récupère les séries actuellement diffusées
+     * @param {number} page - Numéro de la page
+     * @returns {Promise<Object>} - Séries en cours de diffusion
+     */
+    async getOnTheAirSeries(page = 1) {
+        return this.fetchData('/tv/on_the_air', { page });
+    }
+
+    /**
      * Récupère tous les détails d'un film spécifique
      * @param {number} movieId - ID unique du film dans la base TMDB
      * @returns {Promise<Object>} - Objet détaillé du film avec crédits, avis et suggestions
@@ -119,6 +176,52 @@ class TMDBService {
         // Endpoint /search/multi effectue une recherche dans tous les types de médias
         // Retourne films, séries TV et personnes correspondant à la recherche
         return this.fetchData('/search/multi', { query });
+    }
+
+    /**
+     * Recherche uniquement des films par mot-clé
+     * @param {string} query - Terme de recherche
+     * @returns {Promise<Object>} - Résultats de films uniquement
+     */
+    async searchMovies(query) {
+        // Endpoint /search/movie pour rechercher uniquement dans les films
+        return this.fetchData('/search/movie', { query });
+    }
+
+    /**
+     * Recherche uniquement des séries par mot-clé
+     * @param {string} query - Terme de recherche
+     * @returns {Promise<Object>} - Résultats de séries uniquement
+     */
+    async searchSeries(query) {
+        // Endpoint /search/tv pour rechercher uniquement dans les séries
+        return this.fetchData('/search/tv', { query });
+    }
+
+    /**
+     * Recherche des mots-clés/genres correspondant à une requête
+     * @param {string} query - Terme de recherche
+     * @returns {Promise<Object>} - Liste de mots-clés suggérés
+     */
+    async searchKeywords(query) {
+        // Endpoint /search/keyword pour l'autocomplétion intelligente
+        return this.fetchData('/search/keyword', { query });
+    }
+
+    /**
+     * Récupère la liste de tous les genres de films
+     * @returns {Promise<Object>} - Liste des genres avec ID et nom
+     */
+    async getMovieGenres() {
+        return this.fetchData('/genre/movie/list');
+    }
+
+    /**
+     * Récupère la liste de tous les genres de séries
+     * @returns {Promise<Object>} - Liste des genres avec ID et nom
+     */
+    async getTVGenres() {
+        return this.fetchData('/genre/tv/list');
     }
 
     /**

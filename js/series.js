@@ -86,12 +86,12 @@ class SeriesPage {
             this.seriesGrid.innerHTML = '';
             
             // Création d'une carte pour chaque série reçue (24 au total)
-            allSeries.forEach(serie => {
-                // Création de la carte visuelle avec type 'tv' pour série
-                const card = ui.createMediaCard(serie, 'tv');
-                // Ajout de la carte à la grille
-                this.seriesGrid.appendChild(card);
-            });
+            for (const serie of allSeries) {
+                const card = await ui.createMediaCard(serie, 'tv');
+                if (card instanceof Node) {
+                    this.seriesGrid.appendChild(card);
+                }
+            }
 
             // Scroll automatique vers le haut de la page
             // behavior: 'smooth' = animation fluide pour une meilleure UX

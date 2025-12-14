@@ -64,14 +64,13 @@ class HomePage {
             
             // Parcours de chaque film pour créer et ajouter sa carte
             // forEach exécute une fonction pour chaque élément du tableau
-            movies.forEach(movie => {
-                // Création de la carte visuelle du film via le service UI
-                const card = ui.createMediaCard(movie, 'movie');
-                
-                // Ajout de la carte au conteneur (à la fin)
-                // appendChild insère l'élément comme dernier enfant
-                this.popularMoviesContainer.appendChild(card);
-            });
+            for (const movie of movies) {
+                // Création de la carte visuelle du film via le service UI (async)
+                const card = await ui.createMediaCard(movie, 'movie');
+                if (card instanceof Node) {
+                    this.popularMoviesContainer.appendChild(card);
+                }
+            }
         } catch (error) {
             // En cas d'erreur (API down, réseau, etc.)
             console.error('Erreur lors du chargement des films:', error);
@@ -101,11 +100,12 @@ class HomePage {
             const series = data.results.slice(0, 12);
             
             // Création et ajout de chaque carte de série
-            series.forEach(serie => {
-                // Type 'tv' pour les séries (vs 'movie' pour les films)
-                const card = ui.createMediaCard(serie, 'tv');
-                this.popularSeriesContainer.appendChild(card);
-            });
+            for (const serie of series) {
+                const card = await ui.createMediaCard(serie, 'tv');
+                if (card instanceof Node) {
+                    this.popularSeriesContainer.appendChild(card);
+                }
+            }
         } catch (error) {
             console.error('Erreur lors du chargement des séries:', error);
             ui.showError(this.popularSeriesContainer);

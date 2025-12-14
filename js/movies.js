@@ -87,12 +87,12 @@ class MoviesPage {
             this.moviesGrid.innerHTML = '';
             
             // Création d'une carte pour chaque film reçu (24 au total)
-            allMovies.forEach(movie => {
-                // Création de la carte visuelle
-                const card = ui.createMediaCard(movie, 'movie');
-                // Ajout de la carte à la grille
-                this.moviesGrid.appendChild(card);
-            });
+            for (const movie of allMovies) {
+                const card = await ui.createMediaCard(movie, 'movie');
+                if (card instanceof Node) {
+                    this.moviesGrid.appendChild(card);
+                }
+            }
 
             // Scroll automatique vers le haut de la page
             // behavior: 'smooth' = animation fluide au lieu de saut instantané

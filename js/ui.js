@@ -16,38 +16,57 @@ class UI {
      * @param {string} type - Type du média: 'movie' pour film, 'tv' pour série
      * @returns {HTMLElement} - Élément DOM div.media-card prêt à être inséré
      */
-    createMediaCard(item, type) {
-        // Création d'un élément div qui contiendra toute la carte
+
+    async createMediaCard(item, type) {
         const card = document.createElement('div');
-        // Ajout de la classe CSS 'media-card' pour le styling
         card.className = 'media-card';
-        
-        // Extraction du titre: 'title' pour les films, 'name' pour les séries
-        // L'opérateur || retourne la première valeur qui n'est pas null/undefined
         const title = item.title || item.name;
-        
-        // Extraction de la date: 'release_date' pour films, 'first_air_date' pour séries
-        // Si aucune date, afficher 'N/A' (Not Available)
-        const date = item.release_date || item.first_air_date || 'N/A';
-        
-        // Formatage de la note sur 10: toFixed(1) arrondit à 1 décimale
-        // Exemple: 7.543 devient "7.5"
+        const dateString = item.release_date || item.first_air_date || '';
+        const year = dateString ? dateString.split('-')[0] : 'N/A';
         const rating = item.vote_average ? item.vote_average.toFixed(1) : 'N/A';
-        
-        // Construction de l'URL complète de l'affiche via le service API
         const posterUrl = api.getImageUrl(item.poster_path);
-        
-        // Vérification si ce média est déjà dans les favoris de l'utilisateur
         const isFavorite = storage.isFavorite(item.id, type);
 
-        // Construction du HTML interne de la carte avec template literals (backticks)
-        // Les ${} permettent d'insérer des variables JavaScript dans le HTML
-        // Bouton favori positionné en haut à droite de la carte
-        // La classe 'active' est ajoutée si déjà en favori (ternaire: condition ? si_vrai : si_faux)
-        // data-id et data-type sont des attributs HTML personnalisés pour stocker des infos
-        // Émoji différent selon l'état: coeur plein si favori, coeur vide sinon
-        // Image de l'affiche avec lazy loading (chargement différé pour optimiser)
-        // Conteneur pour les informations textuelles (titre, note, date)
+        // Gestion du cache local pour les genres
+        if (!window._cinetechGenresCache) window._cinetechGenresCache = { movie: null, tv: null };
+        let genresList = null;
+        if (type === 'movie') {
+            if (!window._cinetechGenresCache.movie) {
+                try {
+                    const res = await api.getMovieGenres();
+                    window._cinetechGenresCache.movie = res.genres || [];
+                } catch (e) {
+                    window._cinetechGenresCache.movie = [];
+                }
+            }
+            genresList = window._cinetechGenresCache.movie;
+        } else if (type === 'tv') {
+            if (!window._cinetechGenresCache.tv) {
+                try {
+                    const res = await api.getTVGenres();
+                    window._cinetechGenresCache.tv = res.genres || [];
+                } catch (e) {
+                    window._cinetechGenresCache.tv = [];
+                }
+            }
+            genresList = window._cinetechGenresCache.tv;
+        } else {
+            genresList = [];
+        }
+
+        // Mapping des genres de l'item
+        let genreNames = [];
+        if (Array.isArray(item.genre_ids) && genresList && genresList.length > 0) {
+            genreNames = item.genre_ids.map(id => {
+                const found = genresList.find(g => g.id === id);
+                return found ? found.name : null;
+            }).filter(Boolean);
+        } else if (Array.isArray(item.genres) && item.genres.length > 0) {
+            // Certains objets détaillés ont déjà un champ genres [{id, name}]
+            genreNames = item.genres.map(g => g.name);
+        }
+
+        // Construction du HTML
         card.innerHTML = `
             <button class="favorite-btn ${isFavorite ? 'active' : ''}" data-id="${item.id}" data-type="${type}">
                 ${isFavorite ? '❤️' : '🤍'}
@@ -56,37 +75,25 @@ class UI {
             <div class="media-card-content">
                 <h3>${title}</h3>
                 <div class="rating">⭐ ${rating}</div>
-                <div class="date">${date}</div>
+                <div class="date">${year}</div>
+                <div class="genres">${genreNames.length > 0 ? genreNames.join(', ') : ''}</div>
             </div>
         `;
 
         // Ajout d'un écouteur d'événement pour le clic sur toute la carte
-        // addEventListener attache une fonction à exécuter lors du clic
         card.addEventListener('click', (e) => {
-            // e.target = élément cliqué, closest() cherche l'ancêtre le plus proche
-            // Si on n'a PAS cliqué sur le bouton favori (pour éviter conflit)
             if (!e.target.closest('.favorite-btn')) {
-                // Redirection vers la page détail avec paramètres URL
-                // Exemple: detail.html?id=123&type=movie
                 window.location.href = `detail.html?id=${item.id}&type=${type}`;
             }
         });
 
         // Sélection du bouton favori dans la carte
-        // querySelector trouve le premier élément correspondant au sélecteur CSS
         const favoriteBtn = card.querySelector('.favorite-btn');
-        
-        // Écouteur spécifique pour le bouton favori
         favoriteBtn.addEventListener('click', (e) => {
-            // stopPropagation empêche l'événement de remonter au parent (la carte)
-            // Sans ça, cliquer le bouton déclencherait aussi le clic de la carte
             e.stopPropagation();
-            
-            // Appel de la méthode pour basculer l'état favori
             this.toggleFavorite(item, type, favoriteBtn);
         });
 
-        // Retour de l'élément carte complet et fonctionnel
         return card;
     }
 

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trending - Cinetech</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <h1 class="logo"><a href="index.html">🎬 Cinetech</a></h1>
+                
+                <nav>
+                    <ul>
+                        <li><a href="index.html">Accueil</a></li>
+                        <li><a href="movies.html">Films</a></li>
+                        <li><a href="series.html">Séries</a></li>
+                        <li><a href="trending.html" class="active">Trending</a></li>
+                        <li><a href="new-releases.html">Nouveautés</a></li>
+                        <li><a href="favorites.html">Favoris</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                        <li><a href="legal.html">Mentions légales</a></li>
+                        <li><a href="terms.html">CGU</a></li>
+                    </ul>
+                </nav>
+                
+                <div class="search-container">
+                    <input type="text" id="searchInput" placeholder="Rechercher un film, une série...">
+                    <div id="searchResults" class="search-results"></div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="section">
+            <div class="container">
+                <h1 class="page-title">🔥 Trending de la semaine</h1>
+                
+                <!-- Onglets Films / Séries -->
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="movies">Films</button>
+                    <button class="tab-btn" data-tab="series">Séries</button>
+                </div>
+                
+                <!-- Contenu Films -->
+                <div id="moviesTab" class="tab-content active">
+                    <div class="media-grid" id="trendingMoviesGrid"></div>
+                </div>
+                
+                <!-- Contenu Séries -->
+                <div id="seriesTab" class="tab-content">
+                    <div class="media-grid" id="trendingSeriesGrid"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Cinetech. Propulsé par TMDB API.</p>
+            <div class="footer-links">
+                <a href="contact.html">Contact</a>
+                <a href="legal.html">Mentions légales</a>
+                <a href="terms.html">CGU</a>
+            </div>
+        </div>
+    </footer>
+
+    <script type="module" src="js/trending.js"></script>
+</body>
+</html>

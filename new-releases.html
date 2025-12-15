@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nouveautés - Cinetech</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <h1 class="logo"><a href="index.html">🎬 Cinetech</a></h1>
+                
+                <nav>
+                    <ul>
+                        <li><a href="index.html">Accueil</a></li>
+                        <li><a href="movies.html">Films</a></li>
+                        <li><a href="series.html">Séries</a></li>
+                        <li><a href="trending.html">Trending</a></li>
+                        <li><a href="new-releases.html" class="active">Nouveautés</a></li>
+                        <li><a href="favorites.html">Favoris</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                        <li><a href="legal.html">Mentions légales</a></li>
+                        <li><a href="terms.html">CGU</a></li>
+                    </ul>
+                </nav>
+                
+                <div class="search-container">
+                    <input type="text" id="searchInput" placeholder="Rechercher un film, une série...">
+                    <div id="searchResults" class="search-results"></div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="section">
+            <div class="container">
+                <h1 class="page-title">✨ Nouveautés</h1>
+                
+                <!-- Onglets -->
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="now-playing">En salle</button>
+                    <button class="tab-btn" data-tab="upcoming">À venir</button>
+                    <button class="tab-btn" data-tab="airing-today">Séries du jour</button>
+                    <button class="tab-btn" data-tab="on-the-air">Séries en cours</button>
+                </div>
+                
+                <!-- Films en salle actuellement -->
+                <div id="now-playingTab" class="tab-content active">
+                    <h2 class="section-title">🎬 Films en salle</h2>
+                    <div class="media-grid" id="nowPlayingGrid"></div>
+                </div>
+                
+                <!-- Films à venir -->
+                <div id="upcomingTab" class="tab-content">
+                    <h2 class="section-title">🔜 Films à venir</h2>
+                    <div class="media-grid" id="upcomingGrid"></div>
+                </div>
+                
+                <!-- Séries diffusées aujourd'hui -->
+                <div id="airing-todayTab" class="tab-content">
+                    <h2 class="section-title">📺 Séries diffusées aujourd'hui</h2>
+                    <div class="media-grid" id="airingTodayGrid"></div>
+                </div>
+                
+                <!-- Séries actuellement diffusées -->
+                <div id="on-the-airTab" class="tab-content">
+                    <h2 class="section-title">📡 Séries en cours de diffusion</h2>
+                    <div class="media-grid" id="onTheAirGrid"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Cinetech. Propulsé par TMDB API.</p>
+            <div class="footer-links">
+                <a href="contact.html">Contact</a>
+                <a href="legal.html">Mentions légales</a>
+                <a href="terms.html">CGU</a>
+            </div>
+        </div>
+    </footer>
+
+    <script type="module" src="js/new-releases.js"></script>
+</body>
+</html>

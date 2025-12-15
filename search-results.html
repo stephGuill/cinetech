@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Résultats de recherche - Cinetech</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- HEADER -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <h1 class="logo"><a href="index.html">🎬 Cinetech</a></h1>
+                
+                <nav>
+                    <ul>
+                        <li><a href="index.html">Accueil</a></li>
+                        <li><a href="movies.html">Films</a></li>
+                        <li><a href="series.html">Séries</a></li>
+                        <li><a href="favorites.html">Favoris</a></li>
+                    </ul>
+                </nav>
+                
+                <div class="search-container">
+                    <input type="text" id="searchInput" placeholder="Rechercher un film, une série...">
+                    <div id="searchResults" class="search-results"></div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN -->
+    <main>
+        <section class="section">
+            <div class="container">
+                <h1 class="page-title" id="searchTitle">Résultats de recherche</h1>
+                <div class="media-grid" id="resultsGrid"></div>
+                
+                <!-- Message si aucun résultat -->
+                <div id="noResults" style="display: none; text-align: center; padding: 3rem 0;">
+                    <p style="font-size: 1.2rem; color: #999;">Aucun résultat trouvé pour cette recherche.</p>
+                    <p style="color: #666;">Essayez avec d'autres mots-clés.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Cinetech. Propulsé par TMDB API.</p>
+        </div>
+    </footer>
+
+    <script type="module" src="js/search-results.js"></script>
+</body>
+</html>
